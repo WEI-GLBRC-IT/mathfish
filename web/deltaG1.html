@@ -1,0 +1,243 @@
+<!-- 
+    Document   : help
+    Created on : Dec 23, 2008, 3:55:47 PM
+    Author     : CEE299
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>DG1 Calculator</title>
+        <link href="style.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript">
+            function validate()
+            {
+                if(document.form1.NA.value == "" || isNaN(document.form1.NA.value))
+                {
+                    alert("Please Enter Valid Number for NA");
+                    return false;
+                }
+                if(parseFloat(document.form1.NA.value) > 1 || parseFloat(document.form1.NA.value) < 0.1)
+                {
+                    alert("[Na+] should be in the 0.1-1M range");
+                    return false
+                }
+                if(document.form1.T.value == "" || isNaN(document.form1.T.value))
+                {
+                    alert("Please Enter Valid Number for Temperature");
+                    return false;
+                }
+                if (document.form1.organism.value == "")
+                {
+                    alert("Please Enter Valid 16S rRNA Sequence");
+                    return false;
+                }
+                if (document.form1.ts1.value == "" || isNaN(document.form1.ts1.value))
+                {
+                    alert("Please Enter Valid Number for 5' end");
+                    return false;
+                }
+                if (document.form1.ts2.value == "" || isNaN(document.form1.ts2.value))
+                {
+                    alert("Please Enter Valid Number for 3' end");
+                    return false;
+                }
+                if (parseFloat(document.form1.ts1.value) < 0 || parseFloat(document.form1.ts2.value) < 0)
+                {
+                    alert ("Please Enter Positive Numbers for 5' and 3' ends");
+                    return false;
+                }
+                if (parseFloat((document.form1.ts1.value)) > parseFloat((document.form1.ts2.value)))
+                {
+                    alert("3' value should be greater than 5' value");
+                    return false;
+                }
+                if(parseFloat(document.form1.ts2.value) > parseFloat(document.form1.organism.value.length))
+                {
+                    alert("Target site position must be inside the organism sequence");
+                    return false;
+                }
+                if (document.form1.pl.value == "" || isNaN(document.form1.pl.value) || (document.form1.pl.value < 0))
+                {
+                    alert("Please Enter Valid Number for probe length");
+                    return false;
+                }
+                var org = document.form1.organism.value;
+                if(org.charAt(0)=='>')
+                {
+                    var ret = confirm("FASTA Format Detected. First Line will be removed. \n \n\n               Proceed ?");
+                    if(ret == false)
+                        return false;
+                    else
+                        for (var i=0; i<org.length; i++)
+                    {
+                        if((org.charAt(i) == '\n') || (org.charAt(i)=='\r'))
+                        {
+                            var neworg = org.substring(i+1);
+                            break;
+                        }
+                    }
+
+                    document.form1.organism.value = neworg;
+                }
+                else if(org.search(/origin/i) != -1)
+                {
+                    var start = org.search(/origin/i);
+                    var ret = confirm("GENBANK Format Detected.  Other Details will be removed. \n \n\n               Proceed ?");
+                    if(ret == false)
+                        return false;
+                    else
+                    {
+                        var neworg = org.substring(start+7);
+                        document.form1.organism.value = neworg;
+                    }
+                }
+
+                var j =0;
+                org = document.form1.organism.value;
+                var finalorg = '';
+                while(j < org.length)
+                {
+                    if(isNaN(org.charAt(j)) && (org.charAt(j) != '/'))
+                    {
+                        finalorg += org.charAt(j);
+                    }
+                    j++;
+
+                }
+
+                document.form1.organism.value = finalorg;
+                
+                org = document.form1.organism.value;
+                finalorg = '';
+                var flag = 0;
+                j=0;
+                while(j < org.length)
+                {
+                    if(org.charAt(j) != '-')
+                    {
+                        finalorg += org.charAt(j);
+                    }
+                    else
+                    {
+                        if(flag==0)
+                        {
+                            alert('Gaps (-) will be removed from Target Organism.');
+                            flag = 1;
+                        }
+                    }
+                    j++;
+                }
+
+                document.form1.organism.value = finalorg;
+
+                if(document.form1.organism.value.length > 3500)
+                {
+                    alert("The length of the Target organism must be less than 3500 !!");
+                    return false;
+                }
+
+
+                var fiveprime = parseInt(document.form1.ts1.value);
+                var threeprime = parseInt(document.form1.ts2.value);
+                var org = document.form1.organism.value.toUpperCase();
+                for(var j=fiveprime-1;j<threeprime;j++)
+                {
+                    if (org.charAt(j) != 'U'&&org.charAt(j) != 'A' && org.charAt(j) != 'C' && org.charAt(j) != 'G' && org.charAt(j) != 'T' && org.charAt(j) != ' ')
+                    {
+                        alert("Organism sequence has a non-ACTG character(s).\nIf this is because of degenerate positions, please try the different combinations separately.");
+                        return false;
+                    }
+                }
+				
+				var L=parseInt(document.form1.pl.value);
+				
+				var num_probes = threeprime - fiveprime - L + 2;
+
+				if (num_probes > 50) {
+					alert("Too many probes (" + num_probes + ") would be generated. This is not allowed.");
+					return false;
+				}
+				if (num_probes < 1) {
+					alert("Target site is too short to generate any probe with the given length.");
+					return false;
+				}
+
+            }
+
+        </script>
+    </head>
+    <body>
+    <div id = "headimg">
+        <img src="images/uwlogo_web_sm_ctr.png" height="100px" ALT="UW-Madison Logo">
+    </div>
+    <div class="ubercolortabs">
+        <ul>
+            <li><a href="index.html"><span>HOME</span></a></li>
+            <li><a href="helpdocuments.html"><span>HELP</span></a></li>
+            <li><a href="contact.php"><span>CONTACT</span></a></li>
+            <li><a href="download.html"><span>DOWNLOAD</span></a></li>
+            <li><a href="link.html"><span>LINKS</span></a></li>
+            <li><a href="citation.html"><span>CITATIONS</span></a></li>
+        </ul>
+    </div>
+    <br>
+    <br><br><div id="vert_menu">
+        <!--
+   Vertical menu with spans that contain hover description.
+   Right-arrow is a separator for users not viewing style.
+   Added blank li and span in beginning to fix alignment in IE.
+        -->
+        <ul id="vert"><li><span></span></li>
+            <li><a href="probeaff.html"><strong>General Analysis</strong><span>&rarr;Complete  Analysis for any probe-target pair including reaction &#916;G<sup>o</sup>'s,  &#916;G<sup>o</sup>overall, hybridization efficiency, and formamide dissociation  profile.</span></a></li>
+
+            <li><a href="dgovseries.html"><B>&#916;G<sup>o</sup><sub>overall</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>overall</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+            <li id ="selected"><a href="deltaG1.html"><B>&#916;G<sup>o</sup><sub>1</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>1</sub>values for a series of probes of constant length targeting a given region on the organism of interest </span></a></li>
+            <li><a href="deltaG2.html"><B>&#916;G<sup>o</sup><sub>2</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>2</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+            <li><a href="deltaG3.html"><B>&#916;G<sup>o</sup><sub>3</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>3</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+            <li><a href="mismatch.html">Mismatch Analysis<span>&rarr;Evaluation of mismatch stability and its affect on formamide dissociation for given probe, perfect match target, and mismatched target triplet.</span></a></li>
+            <li><a href="formamide.html">Formamide Curve Generator<span>&rarr;Derivation of formamide dissociation profiles for multiple probe/target pairs.</span></a></li>
+            <li><a href="competitor.html">Competitor Analysis<span>&rarr;The effect of a competitor oligo on the formamide dissociation profile of the probe with both target and non-target.</span></a></li>
+        </ul><ul id="vert2">
+            <li><a href="helpdocuments.html">Help<span>&rarr; Guidelines for mathFISH</span></a></li>
+            <li><a href="link.html">Links<span>&rarr; Links to useful websites</span></a></li>
+            <li><a href="citation.html">Citations<span>&rarr;List of Citations</span></a></li>
+            <li><a href="contact.php">Contact Us<span>&rarr; Give us your valuable feedback</span></a></li>
+        </ul>
+    </div>
+    <div id="content">
+        <center><img src="images/logo.jpg"/></center><br>
+        <h1>&#916;G<sup>o</sup><sub>1</sub> Series</h1>
+        <br>
+        <hr>
+        <br>
+        <form name ="form1" id = "form1" METHOD = POST ACTION = "dg1.php" onsubmit=" return validate()">
+            <b>
+                Temperature :&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="T" value="46" size="2" />&nbsp;<sup>o</sup>C
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                [ Na <sup> + </sup>] :&nbsp; &nbsp;&nbsp;<input type="text" name="NA" value="1" size="2" >&nbsp;M
+            </b>
+            <br><br><hr>
+            <b>
+                <div class="help">Enter the target frame :<a href ="#">(?)<span>Target frame is the fragment of the target sequence where probes of the specified length will be walked. The number of probes evaluated is calculated as (<b>3′ end − 5′ end − probe length + 2</b>). Ensure this is <b>not greater than 50</b>. </span></a></div>
+                <br>
+                5' end:&nbsp;&nbsp;
+                <input type="text" name="ts1" value="" size="3">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                3' end : <input type="text" name ="ts2" value="" size="3" >
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                Probe Length :&nbsp;&nbsp;
+                <input type="text" name="pl" value="" size="3"><br><hr><br>
+                <div class="help">Enter the sequence of the Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div>
+                <br>
+                <textarea cols = 80 rows = 5 name = "organism"></textarea>
+            </b><br><br>
+            <center>
+            <input type="submit" value="SUBMIT" name="submitbutton"></center>
+        </form>
+        <br><br><br><br><br><br><br><br><br><br>
+        <br><br><br><br><br><br><br><br><br><br>
+    </div>
+</html>

@@ -1,0 +1,333 @@
+body {
+		background-color: #FFFFEE;
+		font: 0.8em arial, helvetica, sans-serif;
+      }
+hr{
+border: 2px groove;
+}                
+/*
+header {
+		background-color: transparent;
+			
+	}
+	
+#header ul {
+		list-style: none;
+		padding: 0 200px;
+		margin: 0;
+		background:transparent;
+        text-transform: uppercase;
+        position:static;
+        width:80%
+                
+ }
+    
+#header li {
+		float: left;
+		margin: 0 30px 0 0;
+		display: inline;
+		
+    }
+    
+#header a {
+		text-decoration:none;
+		display:block;
+		width:70px;
+		font-weight: bold;
+		color: #4D4E1E;
+		border-bottom: 8px solid #4D4E1E;
+		padding: 0 40px;
+		
+}
+	
+#header a:hover {
+		color:#0000FF;
+		border-color: #0000FF;
+                }
+	
+#header #selected a {
+		color: #0000FF;
+		border-color: #0000FF;
+	}
+*/
+
+.ubercolortabs{
+padding: 0 20em;
+width: 100%;
+overflow: hidden;
+background: transparent;
+}
+
+.ubercolortabs ul{
+font: bold 11px Arial, Verdana, sans-serif;
+margin: 10px;
+padding: 0;
+list-style:none
+}
+
+.ubercolortabs li{
+display: inline;
+margin: 0px 0px 0 0;
+padding: 0em 0em 0em 0em;
+text-transform: uppercase;
+}
+
+
+.ubercolortabs a{
+float: left;
+position:inherit;
+color: white;
+background: #004444 url(roundleft.gif) no-repeat left top; /*default background color of tabs, left corner image*/
+margin: 10px 0px 10px 2px;
+padding: 0px 0 10px 8px;
+text-decoration: none;
+letter-spacing: 5px;
+}
+
+.ubercolortabs a span{
+/*float: left;*/
+display: block;
+background: transparent url(roundright.gif) no-repeat right top; /*right corner image*/
+padding: 7px 10px 3px 6px;
+cursor: pointer;
+}
+
+
+.ubercolortabs a:hover, .ubercolortabs li.selected a{
+background-color: #AE5300; /*background color of tabs onMouseover*/
+color: white;
+}
+
+.ubercolortabs a:hover span{
+background-color: transparent;
+}
+
+
+.ubercolordivider{ /*CSS for horizontal line.*/
+clear: both;
+padding: 0;
+width: 100%;
+height: 1px;
+line-height: 2px;
+background: #804000; /*background color of horizontal line*/
+border-top: 5px solid #fff; /*Remove this to remove border between bar and tabs*/
+}
+
+#content{
+                color: #000077;
+		        display:inline;
+                border-left: ridge;
+                border-right:ridge;
+                z-index: -100;
+                float:left;
+		margin-left: 125px;
+                width:800px;
+                padding: 0 20px;
+                position:static;
+ }    
+        
+	
+h1 {
+		margin: 0;
+		color: #000077;   /*804000*/
+		font-size: 25px;
+		font-style: normal;
+	}
+        
+/*h1 { font-size: 120%; margin: 30px 0px 15px 0px; font-weight: bold; color: #006633; border-bottom: 2px dotted #cccccc; font-style: italic; }*/
+
+h2 { font-size: 130%; margin: 25px 0px 15px 0px; font-weight: bold; color: #000077; font-style: italic; 
+		border-bottom:2px dotted #003366; border-top:2px dotted #003366;
+		}
+
+h3 { font-size: 130%; align: center; border-bottom: 2px dotted #009999; margin: 5px 200px 10px 200px; font-weight: bold; color: #333333; }
+h4 { font-size: 100%; margin: 5px 0px 15px 0px; font-weight: bold; color: #333333; }
+
+/* 
+  vertical orange tool menu
+*/
+#vert_menu {clear:both; width : 200px;  float : left;  display : inline; padding: 0 1em; }
+ 
+/*
+  list which contains the links
+*/
+ul#vert {  list-style-type : none; font-size: 80%; list-style: none; margin: 0; padding: 50px 0; border: 0; }
+ 
+/* 
+  this could be applied to the links, but IE needs this on the li tag
+*/
+ul#vert li { border-bottom: 1px solid #FFFFEE; margin: 0; font-size: 120%;}
+ 
+/*
+  static links
+*/
+ul#vert a {   position : relative;  /* to create a new positioning baseline */  cursor : pointer;
+display: block; padding: 5px;
+/*border-left: 5px solid #1958b7; /* medium blue */
+/*border-right: 5px solid #508fc4; /* light blue */
+/*background-color: #000055; /* bright deep orange #B7A917*/
+border-left: 5px solid #0000FF; /* medium blue */
+border-right: 5px solid #508fc4; /* light blue */
+background-color: #000077; /* bright deep orange #B7A917*/
+
+color: #ffffff; text-decoration: none; font-weight: bold; width:80%; }
+
+ul#vert #selected a {background-color: #0066FF;}
+ 
+/*
+  span (kept off screen until needed
+*/
+ul#vert a span { position : absolute;   top : -1000px;   left : -100px;   display : block;   width : 150%;
+border-left : 0px;   padding : 5px;   padding-left : 40px;   text-indent : -16px;   cursor : pointer; /* needed for opera */
+font-weight: normal; margin: 0px 15px; z-index: 100; border: dotted 2px #B7A917; color: #000000; font-size: 125%;
+background-color: #ffe6d5;  }
+ 
+/* 
+  hover/focus link
+*/
+ul#vert a:hover, ul#vert a:focus, ul#vert a:active { background: #AE5300 repeat-x;  color : #000000;  }
+
+/*
+  re-postion the pre-styled span on hover/focus
+*/
+ul#vert a:hover span, ul#vert a:focus span, ul#vert a:active span {  top : -1px;  left : 120px;  }
+
+ 
+/*
+  list which contains the links
+*/
+ul#vert2 {  list-style-type : none; font-size: 80%; list-style: none; margin: 0; padding:0 0; border: 0; }
+
+/*
+  this could be applied to the links, but IE needs this on the li tag
+*/
+ul#vert2 li { border-bottom: 1px solid #FFFFEE; margin: 0; font-size: 120%;}
+
+/*
+  static links
+*/
+ul#vert2 a {   position : relative;  /* to create a new positioning baseline */  cursor : pointer;
+display: block; padding: 5px;
+/*border-left: 5px solid #1958b7; /* medium blue */
+/*border-right: 5px solid #508fc4; /* light blue */
+/*background-color: #000055; /* bright deep orange #B7A917*/
+border-left: 5px solid #006666; /* medium blue */
+border-right: 5px solid #118888; /* light blue */
+background-color: #004444; /* bright deep orange #B7A917*/
+
+color: #ffffff; text-decoration: none; font-weight: bold; width:80%; }
+
+/*
+  span (kept off screen until needed
+*/
+ul#vert2 a span { position : absolute;   top : -1000px;   left : -100px;   display : block;   width : 150%;
+border-left : 0px;   padding : 5px;   padding-left : 40px;   text-indent : -16px;   cursor : pointer; /* needed for opera */
+font-weight: normal; margin: 0px 15px; z-index: 100; border: dotted 2px #B7A917; color: #000000; font-size: 125%;
+background-color: #ffe6d5;  }
+
+/*
+  hover/focus link
+*/
+ul#vert2 a:hover, ul#vert a:focus, ul#vert a:active { background: #AE5300 repeat-x;  color : #000000;  }
+
+/*
+  re-postion the pre-styled span on hover/focus
+*/
+ul#vert2 a:hover span, ul#vert a:focus span, ul#vert a:active span {  top : -1px;  left : 120px;  }
+
+
+#loadimage
+{
+    position:fixed;
+    top: 50%;
+    left:50%;    
+}
+#headimg
+{
+    float : left;
+    position : absolute;
+    padding: 20px 20px;
+}
+
+
+.help a span {position : absolute;   top : -1000px;   left : 20px;   width : 1150%;
+border-left : 0px;   padding : 5px;   padding-left : 40px;   text-indent : -16px;   cursor : pointer; /* needed for opera */
+font-weight: normal; margin: 0px 15px; z-index: 100; border: dotted 2px #B7A917; color: #000000; font-size: 125%;
+background-color: #ffe6d5; }
+
+.help a {
+
+     position :relative;  /* to create a new positioning baseline */  cursor : pointer;
+     color:#804000; text-decoration: none; font-weight: bold; width:100%;
+}
+/*
+  hover/focus link
+*/
+.help a:hover, .help a:focus,.help a:active { background: #ffffee repeat-x;  color : #000000;  }
+
+/*
+  re-postion the pre-styled span on hover/focus
+*/
+.help a:hover span, .help a:focus span,.help a:active span {top:-20px;}
+
+
+/* KEEP THIS LAST PLEASE -- do not delete */		
+ 
+.blue_content { margin-top: 10px; padding: 3px; background:/* #abbccd */#6999d6; }
+.orange_content { padding:10px; background: #ffdec8; }
+
+
+
+
+/* TITLE-BAR (Added from Steenboock Library Pages*/
+
+#title-bar {
+	background-color: #000077;
+	height: 2.7em;
+}
+
+#title-bar a {
+	text-decoration: underline;
+	color: #860E08;
+}
+
+#title-bar a:hover {
+	text-decoration: none;
+}
+
+#title-bar h1 {
+	font-size: 1.8em;
+	color: white;
+	padding: 0.25em .2em 0.25em 0.2em;
+}
+
+
+#title-bar p {
+	padding: 0.25em .2em 0.25em 1em;
+}
+
+
+li.current, li.current a {
+	font-weight: bold;
+	color: #222;
+}
+
+#title-bar2 {
+	background-color: #004444;
+	height: 2.7em;
+}
+
+#title-bar2 h1 {
+	font-size: 1.8em;
+	color: white;
+	padding: 0.25em .2em 0.25em 0.2em;
+}
+
+#title-bar3 {
+	background-color: #ffffff;
+	height: 2.5em;
+}
+
+
+#title-bar3 h2 {font-size: 135%; margin: 0px 300px 0px 0px; font-weight: bold; color: #000000; border-bottom: 2px solid #000077; border-top: none; font-style: italic;
+}

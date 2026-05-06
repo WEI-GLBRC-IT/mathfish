@@ -1,0 +1,416 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Calculator</title>
+        <meta http-equiv="Content-Type" content="text/html">
+        <link href="style.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript">
+            function validate()
+            {
+
+                var go = true;
+                var diff = 0;
+                if(document.form1.NA.value == "" || isNaN(document.form1.NA.value))
+                {
+                    alert("Please Enter Valid Number for NA");
+                    return false;
+                }
+                if(parseFloat(document.form1.NA.value) > 1 || parseFloat(document.form1.NA.value) < 0.1)
+                {
+                    alert("[Na+] should be in the 0.1-1M range");
+                    return false
+                }
+                if(document.form1.T.value == "" || isNaN(document.form1.T.value))
+                {
+                    alert("Please Enter Valid Number for Temperature");
+                    return false;
+                }
+                if(document.form1.Po.value == "" || isNaN(document.form1.Po.value))
+                {
+                    alert("Please Enter Valid Number for Probe Concentration");
+                    return false;
+                }
+                for(var k = 0; k<5;k++)
+                {
+
+                    if(document.form1.check[k].checked==true)
+                    {
+                        var pro = document.form1["probe[]"][k].value;
+                        pro = pro.toUpperCase();
+                        var finalpro='';
+			var j = 0;
+			var probenumber = k+1;
+			probenumber+= '';
+			while(j < pro.length)
+                        {
+                        if(pro.charAt(j)!='I' && pro.charAt(j)!='M' && pro.charAt(j)!='R' && pro.charAt(j)!='W' && pro.charAt(j)!='S' && pro.charAt(j)!='Y'                          && pro.charAt(j)!='K' && pro.charAt(j)!='V' && pro.charAt(j)!='H' && pro.charAt(j)!='D' && pro.charAt(j)!='B' && pro.charAt(j)!='N' &&                             pro.charAt(j) != 'A' && pro.charAt(j) != 'C' && pro.charAt(j) != 'G' && pro.charAt(j) != 'T' && pro.charAt(j) != ' ')
+                        {
+
+                           alert("Probe sequence "+probenumber+" has a non-IUPAC character(s).\nPlease re-enter the probe sequence.");
+                           return false;
+                          }
+                            j++;
+                        }
+                        j=0;
+                        while(j < pro.length)
+                        {
+                         if(pro.charAt(j)=='I' || pro.charAt(j)=='M' || pro.charAt(j)=='R' || pro.charAt(j)=='W' || pro.charAt(j)=='S' || pro.charAt(j)=='Y'                          || pro.charAt(j)=='K' || pro.charAt(j)=='V' || pro.charAt(j)=='H' || pro.charAt(j)=='D' || pro.charAt(j)=='B' || pro.charAt(j)=='N')
+                            {
+                                //alert("Probe sequence has IUPAC characters other than base codes, space, and gaps. \n Please check the probe sequence and                                     resubmit.");
+                                //window.open('table_iupac_codes.html','IUPAC Codes','width=550,height=550');
+                                windowOpener('table_iupac_codes.html','IUPAC Codes', 'width=550,height=550');
+                                return false;
+
+                            }
+
+                            if(pro.charAt(j)!=' ')
+                            {
+                                finalpro+=pro.charAt(j);
+                            }
+                            j++;
+                        }
+
+
+                        document.form1["probe[]"][k].value = finalpro;
+
+                        if (document.form1["organism[]"][k].value == "")
+                        {
+                            alert("Please Enter Valid 16S rRNA Sequence for target organism " + (k+1));
+                            return false;
+                        }
+                        if(document.form1["probe[]"][k].value == "")
+                        {
+                            alert("Please Enter Valid Sequence for the probe " +(k+1));
+                            return false;
+                        }
+
+                        var org = document.form1["organism[]"][k].value;
+                        if(org.charAt(0)=='>')
+                        {
+                            var ret = confirm("FASTA Format Detected for organism "+(k+1)+ ". First Line will be removed. \n \n\n               Proceed ?");
+                            if(ret == false)
+                                return false;
+                            else
+                                for (var i=0; i<org.length; i++)
+                            {
+                                if((org.charAt(i) == '\n') || (org.charAt(i)=='\r'))
+                                {
+                                    var neworg = org.substring(i+1);
+                                    break;
+                                }
+                            }
+
+                            document.form1["organism[]"][k].value = neworg;
+                        }
+                        else if(org.search(/origin/i) != -1)
+                        {
+                            var start = org.search(/origin/i);
+                            var ret = confirm("GENBANK Format Detected for organism "+(k+1)+ ".  Other Details will be removed. \n \n\n               Proceed ?");
+                            if(ret == false)
+                                return false;
+                            else
+                            {
+                                var neworg = org.substring(start+7);
+                                document.form1["organism[]"][k].value = neworg;
+                            }
+                        }
+
+                        var j =0;
+                        org = document.form1["organism[]"][k].value;
+                        var finalorg = '';
+                        while(j < org.length)
+                        {
+
+                            if(isNaN(org.charAt(j)) && (org.charAt(j) != '/'))
+                            {
+                                finalorg += org.charAt(j);
+                            }
+                            j++;
+                        }
+
+                        document.form1["organism[]"][k].value = finalorg;
+
+                        var org = document.form1["organism[]"][k].value;
+                        var finalorg = '';
+                        var flag = 0;
+                        var j=0;
+                        while(j < org.length)
+                        {
+                            if(org.charAt(j) != '-')
+                            {
+                                finalorg += org.charAt(j);
+                            }
+                            else
+                            {
+                                if(flag==0)
+                                {
+                                    alert('Gaps (-) will be removed from Target Organism '+(k+1));
+                                    flag = 1;
+                                }
+                            }
+                            j++;
+                        }
+                        document.form1["organism[]"][k].value = finalorg;
+
+                        if(document.form1["organism[]"][k].value.length > 3500)
+                        {
+                            alert("The length of the Target organism" + (k+1) +" should not be greater than 3500 !!");
+                            return false;
+                        }
+
+                        if(document.form1["probe[]"][k].value.length > 50)
+                        {
+                            alert("The length of the probe " + (k+1) +"  should not be greater than 50 !!");
+                            return false;
+                        }
+
+                        var j=0;
+                        var finaltar='';
+                        var tar =  document.form1["organism[]"][k].value;
+                        tar = tar.toUpperCase();
+                        while(j < tar.length)
+                        {
+                            
+		     if(tar.charAt(j)!='I' && tar.charAt(j)!='M' && tar.charAt(j)!='R' && tar.charAt(j)!='W' && tar.charAt(j)!='S' && tar.charAt(j)!='Y'
+                     && tar.charAt(j)!='K' && tar.charAt(j)!='V' && tar.charAt(j)!='H' && tar.charAt(j)!='D' && tar.charAt(j)!='B' && tar.charAt(j)!='N' &&
+                     tar.charAt(j) != 'A' && tar.charAt(j) != 'C' && tar.charAt(j) != 'G' && tar.charAt(j) != 'T' && tar.charAt(j) != ' ')
+
+			    {
+                                alert("Target sequence "+(k+1)+ " has non-IUPAC character(s).\nPlease re-enter the target sequence.");
+                                return false;
+                            }
+                            if(tar.charAt(j)!=' ' && tar.charAt(j)!='-')
+                            {
+                                finaltar+=tar.charAt(j);
+                            }
+                            j++;
+                        }
+                        document.form1["organism[]"][k].value=finaltar;
+
+                    }
+                }
+                sendchkdata();
+                return true;
+            }
+
+            function disabledomain()
+            {
+                if(document.form1.targetmolecule.value == "other")
+                {
+                    document.form1.domain.disabled = true;
+                }
+                else
+                {
+                    document.form1.domain.disabled = false;
+                }
+            }
+
+            var numberofsets = 1;
+
+            function addElement() {
+
+                if(numberofsets == 5)
+                {
+                    alert("You can have a maximum of 5 probe-target sequences ")
+                    return;
+                }
+                numberofsets++;
+                var ni = document.getElementById('myDiv');
+                var numi = document.getElementById('theValue');
+                var num = (document.getElementById('theValue').value-1) + 2;
+                numi.value = num;
+                var newdiv = document.createElement('div');
+                var divIdName = 'my'+num+'Div';
+                newdiv.setAttribute('id',divIdName);
+                newdiv.innerHTML = '<a href=\'#\' onclick=\'removeElement('+divIdName+')\'>Remove '+num+' </a><br>Probe Sequence :&nbsp;5\'&nbsp;<input type="text" name="probe'+num+'" value ="" size="25">&nbsp;3\' <br> Enter the sequence of the Target Organism :<br><br><textarea cols = 60 rows = 5 name = "organism'+num+'"></textarea><hr>';
+                ni.appendChild(newdiv);
+            }
+
+            function removeElement(divNum) {
+                var d = document.getElementById('myDiv');
+                //var olddiv = document.getElementById(divNum);
+                d.removeChild(divNum);
+                numberofsets--;
+            }
+
+            function disable(num)
+            {
+                if(document.form1.check[num].checked==true)
+                {
+                    document.form1["probe[]"][num].disabled=false;
+                    document.form1["organism[]"][num].disabled=false;
+                }
+                else
+                {
+                    document.form1["probe[]"][num].disabled=true;
+                    document.form1["organism[]"][num].disabled=true;
+                }
+            }
+
+            function sendchkdata()
+            {
+                var text='';
+                for(var i=0; i<5; i++)
+                {
+                    if(document.form1.check[i].checked==true)
+                        text = text + ' ' +i;
+                }
+                var numi = document.getElementById('theValue');
+                numi.value = text;
+            }
+	    function windowOpener(url, name, args) {
+if (typeof(popupWin) != "object"){
+popupWin = window.open(url,name,args);
+} else {
+if (!popupWin.closed){
+popupWin.location.href = url;
+} else {
+popupWin = window.open(url, name,args);
+}
+}
+popupWin.focus();
+}
+
+
+
+        </script>
+    </head>
+    <body>
+        <div id = "headimg">
+            <img src="images/uwlogo_web_sm_ctr.png" height="100px" ALT="UW-Madison Logo">
+        </div>
+        <div class="ubercolortabs">
+            <ul>
+                <li><a href="index.html"><span>HOME</span></a></li>
+                <li><a href="helpdocuments.html"><span>HELP</span></a></li>
+                <li><a href="download.html"><span>DOWNLOAD</span></a></li>
+                <li><a href="link.html"><span>LINKS</span></a></li>
+                <li><a href="citation.html"><span>CITATIONS</span></a></li>
+                <li><a href="contact.php"><span>CONTACT</span></a></li>
+            </ul>
+        </div>
+        <br>
+        <br><br><div id="vert_menu">
+            <!--
+   Vertical menu with spans that contain hover description.
+   Right-arrow is a separator for users not viewing style.
+   Added blank li and span in beginning to fix alignment in IE.
+            -->
+            <ul id="vert"><li><span></span></li>
+                <li><a href="probeaff.html"><strong>General Analysis</strong><span>&rarr;Complete  Analysis for any probe-target pair including reaction &#916;G<sup>o</sup>'s,  &#916;G<sup>o</sup>overall, hybridization efficiency, and formamide dissociation  profile.</span></a></li>
+
+                <li><a href="dgovseries.html"><B>&#916;G<sup>o</sup><sub>overall</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>overall</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+                <li><a href="deltaG1.html"><B>&#916;G<sup>o</sup><sub>1</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>1</sub>values for a series of probes of constant length targeting a given region on the organism of interest </span></a></li>
+                <li><a href="deltaG2.html"><B>&#916;G<sup>o</sup><sub>2</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>2</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+                <li><a href="deltaG3.html"><B>&#916;G<sup>o</sup><sub>3</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>3</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+                <li><a href="mismatch.html">Mismatch Analysis<span>&rarr;Evaluation of mismatch stability and its affect on formamide dissociation for given probe, perfect match target, and mismatched target triplet.</span></a></li>
+                <li id ="selected"><a href="formamide.html">Formamide Curve Generator<span>&rarr;Derivation of formamide dissociation profiles for multiple probe/target pairs.</span></a></li>
+                <li><a href="competitor.html">Competitor Analysis<span>&rarr;The effect of a competitor oligo on the formamide dissociation profile of the probe with both target and non-target.</span></a></li>
+            </ul><ul id="vert2">
+                <li><a href="helpdocuments.html">Help<span>&rarr; Guidelines for mathFISH</span></a></li>
+                <li><a href="link.html">Links<span>&rarr; Links to useful websites</span></a></li>
+                <li><a href="citation.html">Citations<span>&rarr;List of Citations</span></a></li>
+                <li><a href="contact.php">Contact Us<span>&rarr; Give us your valuable feedback</span></a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <center><img src="images/logo.jpg"/></center><br>		
+			
+            <h1>Formamide Curve Generator</h1>
+            <hr><br>
+            <form name ="form1" id = "form1" METHOD = POST ACTION = "formamide.php" onsubmit= "return validate()">
+                <b> <div class ="help">
+                        Temperature:&nbsp;&nbsp;<input type="text" name="T" value="46" size="2" />&nbsp;<sup>o</sup>C
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        [ Na <sup> + </sup>]:&nbsp; &nbsp;<input type="text" name="NA" value="1" size="2" >&nbsp;M
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Probe Concentration : &nbsp;
+                    <input type="text" name="Po" value ="250" size="2" >&nbsp; nM &nbsp; <a href ="#">(?)<span>Typical Range is 250nM to 1000nM.</span></a></div>
+                </b>
+                <br><hr>
+                <b>
+                    Select your Target Molecule :&nbsp;
+                    <select name = "targetmolecule" onchange="disabledomain()">
+                        <option value = "ssu">Small Subunit rRNA</option>
+                        <option value = "lsu">Large subunit rRNA</option>
+                        <option value = "other">Other</option>
+                    </select>
+                    <br><br>
+                    Select the Domain of life for the Target molecule : &nbsp;
+                    <select name = "domain">
+                        <option value = "b">Bacteria</option>
+                        <option value = "a">Archaea</option>
+                        <option value = "e">Eukarya</option>
+                    </select><hr>
+                    <input type="checkbox" name= "check" value ="0"onclick="disable(0)">Select
+                    <br>
+                    Probe Sequence :&nbsp;5'&nbsp;<input type="text" name="probe[]" value ="" size="25" disabled>&nbsp;3'
+                </b>
+                <br><br>
+                <b>
+
+                    <div class="help">Enter the sequence of the Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div>
+                    <br>
+                    <br>
+                    <textarea cols = 60 rows = 5 name = "organism[]" disabled></textarea>
+                    <hr>
+                    <input type="checkbox" name="check" value="1" onchange="disable(1)">Select
+                    <br>
+                    Probe Sequence :&nbsp;5'&nbsp;<input type="text" name="probe[]" value ="" size="25" disabled>&nbsp;3'
+                </b>
+                <br><br>
+                <b>
+                    <div class="help">Enter the sequence of the Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div>
+                    <br>
+                    <br>
+                    <textarea cols = 60 rows = 5 name = "organism[]" disabled></textarea>
+                    <hr>
+                    <input type="checkbox" name="check" value="2" onchange="disable(2)">Select
+                    <br>
+                    Probe Sequence :&nbsp;5'&nbsp;<input type="text" name="probe[]" value ="" size="25" disabled>&nbsp;3'
+                </b>
+                <br><br>
+                <b>
+                    <div class="help">Enter the sequence of the Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div>
+                    <br>
+                    <br>
+                    <textarea cols = 60 rows = 5 name = "organism[]" disabled></textarea>
+                    <hr>
+                    <input type="checkbox" name="check" value="3" onchange="disable(3)">Select
+                    <br>
+                    Probe Sequence :&nbsp;5'&nbsp;<input type="text" name="probe[]" value ="" size="25" disabled>&nbsp;3'
+                </b>
+                <br><br>
+                <b>
+                    <div class="help">Enter the sequence of the Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div>
+                    <br>
+                    <br>
+                    <textarea cols = 60 rows = 5 name = "organism[]" disabled></textarea>
+                    <hr>
+                    <input type="checkbox" name="check" value="4" onchange="disable(4)">Select
+                    <br>
+                    Probe Sequence :&nbsp;5'&nbsp;<input type="text" name="probe[]" value ="" size="25" disabled>&nbsp;3'
+                </b>
+                <br><br>
+                <b>
+                    <div class="help">Enter the sequence of the Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div>
+                    <br>
+                    <br>
+                    <textarea cols = 60 rows = 5 name = "organism[]" disabled></textarea>
+                    <hr>
+                    <div id="myDiv"> </div>
+
+
+                    <input type="hidden" value="0" name ="chkdata" id="theValue" />
+                    <!-- <p><a href="javascript:;" onclick="addElement();">Add More Probe - Target Sequences</a></p> -->
+                </b>
+
+                <center>
+                <input type="submit" value="SUBMIT" name="submitbutton"></center>
+            </form>
+            <div id ="loadimage">
+                <img src="loading.gif" name = "loadimg" style="display:none" alt="loading image">
+            </div>
+        </div>
+    </body>
+</html> 

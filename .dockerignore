@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+
+# Backups and temp files
+backups/
+*.bak
+*.tmp
+*~
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+log/
+*.log
+
+# User files (generated at runtime)
+userFiles/*
+!userFiles/.gitkeep
+
+# Server configs (not needed in container)
+conf.d/
+
+# Installer scripts (not needed in container)
+installers/
+
+# Test files
+testcurl.sh

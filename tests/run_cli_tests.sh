@@ -1,0 +1,61 @@
+#!/bin/bash
+# Run every TESTING.md CLI case. Prints outputVars for each so output can be
+# diffed between backends. Intended to be invoked with:
+#   docker exec -w /var/www/html mathfish bash /tests/run_cli_tests.sh
+#
+# (Mount this file in or copy it; we invoke from the host via docker exec.)
+
+set -eo pipefail
+
+ORG='AAATTGAAGAGTTTGATCATGGCTCAGATTGAACGCTGGCGGCAGGCCTAACACATGCAAGTCGAACGGTAACAGGAAGCAGCTTGCTGCTTTGCTGACGAGTGGCGGACGGGTGAGTAATGTCTGGGAAACTGCCTGATGGAGGGGGATAACTACTGGAAACGGTAGCTAATACCGCATAACGTCGCAAGACCAAAGAGGGGGACCTTAGGGCCTCTTGCCATCGGATGTGCCCAGATGGGATTAGCTAGTAGGTGGGGTAACGGCTCACCTAGGCGACGATCCCTAGCTGGTCTGAGAGGATGACCAGCCACACTGGAACTGAGACACGGTCCAGACTCCTACGGGAGGCAGCAGTGGGGAATATTGCACAATGGGCGCAAGCCTGATGCAGCCATGCCGCGTGTATGAAGAAGGCCTTCGGGTTGTAAAGTACTTTCAGCGGGGAGGAAGGGAGTAAAGTTAATACCTTTGCTCATTGACGTTACCCGCAGAAGAAGCACCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTTGTTAAGTCAGATGTGAAATCCCCGGGCTCAACCTGGGAACTGCATCTGATACTGGCAAGCTTGAGTCTCGTAGAGGGGGGTAGAATTCCAGGTGTAGCGGTGAAATGCGTAGAGATCTGGAGGAATACCGGTGGCGAAGGCGGCCCCCTGGACGAAGACTGACACG'
+# 2-mismatch variant (positions 346-347 AC -> AA in probe binding region)
+MM='AAATTGAAGAGTTTGATCATGGCTCAGATTGAACGCTGGCGGCAGGCCTAACACATGCAAGTCGAACGGTAACAGGAAGCAGCTTGCTGCTTTGCTGACGAGTGGCGGACGGGTGAGTAATGTCTGGGAAACTGCCTGATGGAGGGGGATAACTACTGGAAACGGTAGCTAATACCGCATAACGTCGCAAGACCAAAGAGGGGGACCTTAGGGCCTCTTGCCATCGGATGTGCCCAGATGGGATTAGCTAGTAGGTGGGGTAACGGCTCACCTAGGCGACGATCCCTAGCTGGTCTGAGAGGATGACCAGCCACACTGGAACTGAGACACGGTCCAGACTCCTAAGGCAGGCAGCAGTGGGGAATATTGCACAATGGGCGCAAGCCTGATGCAGCCATGCCGCGTGTATGAAGAAGGCCTTCGGGTTGTAAAGTACTTTCAGCGGGGAGGAAGGGAGTAAAGTTAATACCTTTGCTCATTGACGTTACCCGCAGAAGAAGCACCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTTGTTAAGTCAGATGTGAAATCCCCGGGCTCAACCTGGGAACTGCATCTGATACTGGCAAGCTTGAGTCTCGTAGAGGGGGGTAGAATTCCAGGTGTAGCGGTGAAATGCGTAGAGATCTGGAGGAATACCGGTGGCGAAGGCGGCCCCCTGGACGAAGACTGACACG'
+
+PROBE='GCTGCCTCCCGTAGGAGTCTGGAC'
+COMPE='GCAGCCACACTGGAACTGAGACAC'
+
+run_case() {
+    local name="$1"; shift
+    local script="$1"; shift
+    local inputs="$1"; shift
+    local CODE="t_${name}_$$"
+
+    printf "%b" "$inputs" > "userFiles/inputVars_${CODE}.txt"
+    python3 "$script" "$CODE" >/dev/null 2>&1 || { echo "[$name] SCRIPT FAILED"; return 1; }
+    echo "### $name"
+    cat "userFiles/outputVars_${CODE}.txt"
+    echo
+    # series/csv outputs if any
+    for suffix in dg1series dg2series dg3series dgovseries facurve; do
+        f="userFiles/${suffix}_${CODE}.csv"
+        [ -f "$f" ] && { echo "--- $suffix ---"; cat "$f"; echo; }
+    done
+    rm -f userFiles/*${CODE}*
+}
+
+common_input="VAR_T\n46\nVAR_NA\n1\nVAR_organism\n${ORG}\n"
+
+# 1. General Analysis
+run_case general general.py \
+"VAR_T\n46\nVAR_NA\n1\nVAR_Po\n250\nVAR_entry\np\nVAR_ts1\nNA\nVAR_ts2\nNA\nVAR_iptargetsequence\nNA\nVAR_ipprobesequence\n${PROBE}\nVAR_targetmolecule\nssu\nVAR_domain\nb\nVAR_organism\n${ORG}\n"
+
+# 2. dG1 Series
+run_case dg1 dg1.py "${common_input}VAR_ts1\n196\nVAR_ts2\n213\nVAR_pl\n15\n"
+# 3. dG2 Series
+run_case dg2 dg2.py "${common_input}VAR_ts1\n196\nVAR_ts2\n213\nVAR_pl\n15\n"
+# 4. dG3 Series
+run_case dg3 dg3.py "${common_input}VAR_ts1\n196\nVAR_ts2\n213\nVAR_pl\n15\nVAR_targetmolecule\nssu\nVAR_domain\nb\n"
+# 5. dGov Series
+run_case dgov dgovser.py "${common_input}VAR_ts1\n196\nVAR_ts2\n213\nVAR_pl\n15\nVAR_targetmolecule\nssu\nVAR_domain\nb\n"
+
+# 6. Formamide
+run_case formamide formamide.py \
+"VAR_T\n46\nVAR_NA\n1\nVAR_Po\n250\nVAR_targetmolecule\nssu\nVAR_domain\nb\nVAR_probes\n${PROBE}\nVAR_organisms\n${ORG}\n"
+
+# 7. Mismatch
+run_case mismatch mismatch.py \
+"VAR_T\n46\nVAR_NA\n1\nVAR_Po\n250\nVAR_ipprobesequence\n${PROBE}\nVAR_targetmolecule\nssu\nVAR_domain\nb\nVAR_organism\n${ORG}\nVAR_mismatch\n${MM}\n"
+
+# 8. Competitor
+run_case competitor competitor.py \
+"VAR_T\n46\nVAR_NA\n1\nVAR_Po\n250\nVAR_Co\n5000\nVAR_probe\n${PROBE}\nVAR_compe\n${COMPE}\nVAR_targetmolecule\nssu\nVAR_domain\nb\nVAR_organism\n${ORG}\nVAR_nontarget\n${ORG}\n"

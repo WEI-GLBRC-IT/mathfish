@@ -1,0 +1,462 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Calculator</title>
+        <meta http-equiv="Content-Type" content="text/html">
+        <link href="style.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript">
+            function validate()
+            {
+                //
+                if(document.form1.Po.value == "" || isNaN(document.form1.Po.value))
+                {
+                    alert("Please Enter Valid Number for Probe Concentration");
+                    return false;
+                }
+                if(document.form1.Co.value == "" || isNaN(document.form1.Po.value))
+                {
+                    alert("Please Enter Valid Number for Competitor Concentration");
+                    return false;
+                }
+                //
+                var pro = document.form1.probe.value;
+                pro = pro.toUpperCase();
+                var finalpro='';
+		var j = 0;
+                 while(j < pro.length)
+                        {
+                        if(pro.charAt(j)!='I' && pro.charAt(j)!='M' && pro.charAt(j)!='R' && pro.charAt(j)!='W' && pro.charAt(j)!='S' && pro.charAt(j)!='Y'
+                          && pro.charAt(j)!='K' && pro.charAt(j)!='V' && pro.charAt(j)!='H' && pro.charAt(j)!='D' && pro.charAt(j)!='B' && pro.charAt(j)!='N'                          && pro.charAt(j) != 'A' && pro.charAt(j) != 'C' && pro.charAt(j) != 'G' && pro.charAt(j) != 'T' && pro.charAt(j) != ' ')
+                        {
+
+                           alert("Probe sequence has a non-IUPAC character(s).\nPlease re-enter the probe sequence.");
+                           return false;
+                          }
+                            j++;
+                        }
+                        j=0;
+                        while(j < pro.length)
+                        {
+                        if(pro.charAt(j)=='I' || pro.charAt(j)=='M' || pro.charAt(j)=='R' || pro.charAt(j)=='W' || pro.charAt(j)=='S' || pro.charAt(j)=='Y'                          || pro.charAt(j)=='K' || pro.charAt(j)=='V' || pro.charAt(j)=='H' || pro.charAt(j)=='D' || pro.charAt(j)=='B' || pro.charAt(j)=='N')
+                        {
+                     //alert("Probe sequence has IUPAC characters other than base codes, space, and gaps. \n Please check the probe sequence and resubmit.");
+                    //window.open('table_iupac_codes.html','IUPAC Codes','width=550,height=550');
+                         windowOpener('table_iupac_codes.html','IUPAC Codes', 'width=550,height=550');
+                         return false;
+                         }
+                         if(pro.charAt(j)!=' ')
+                        {
+                            finalpro+=pro.charAt(j);
+                         }
+                            j++;
+                       }
+		document.form1.probe.value = finalpro;
+                var compe = document.form1.compe.value;
+                compe = compe.toUpperCase();
+                var finalcompe='';
+		j = 0;
+	      while(j < compe.length)
+              {
+              if(compe.charAt(j)!='I' && compe.charAt(j)!='M' && compe.charAt(j)!='R' && compe.charAt(j)!='W' && compe.charAt(j)!='S' && compe.charAt(j)!='Y'
+              && compe.charAt(j)!='K' && compe.charAt(j)!='V' && compe.charAt(j)!='H' && compe.charAt(j)!='D' && compe.charAt(j)!='B' && compe.charAt(j)!='N' 		   && compe.charAt(j) != 'A' && compe.charAt(j) != 'C' && compe.charAt(j) != 'G' && compe.charAt(j) != 'T' && compe.charAt(j) != ' ')
+              {
+                 alert("Competitor sequence has a non-IUPAC character(s).\nPlease re-enter the probe sequence.");
+                 return false;
+              }
+              j++;
+              }
+              j=0;
+              while(j < compe.length)
+              {
+              if(compe.charAt(j)=='I' || compe.charAt(j)=='M' || compe.charAt(j)=='R' || compe.charAt(j)=='W' || compe.charAt(j)=='S' || compe.charAt(j)=='Y'		   || compe.charAt(j)=='K' || compe.charAt(j)=='V' || compe.charAt(j)=='H' || compe.charAt(j)=='D' || compe.charAt(j)=='B' || compe.charAt(j)=='N'              )
+              {
+                 //alert("Probe sequence has IUPAC characters other than base codes, space, and gaps. \n Please check the probe sequence and  resubmit.");
+                 //window.open('table_iupac_codes.html','IUPAC Codes','width=550,height=550');
+                 windowOpener('table_iupac_codes.html','IUPAC Codes', 'width=550,height=550');
+                 return false;
+              }
+              if(compe.charAt(j)!=' ')
+              {
+                 finalcompe+=compe.charAt(j);
+              }
+              j++;
+              }
+
+              document.form1.compe.value = finalcompe;
+
+                if(document.form1.NA.value == "" || isNaN(document.form1.NA.value))
+                {
+                    alert("Please Enter Valid Number for NA");
+                    return false;
+                }
+                if(parseFloat(document.form1.NA.value) > 1 || parseFloat(document.form1.NA.value) < 0.1)
+                {
+                    alert("[Na+] should be in the 0.1-1M range");
+                    return false
+                }
+                if(document.form1.T.value == "" || isNaN(document.form1.T.value))
+                {
+                    alert("Please Enter Valid Number for Temperature");
+                    return false;
+                }
+                if (document.form1.organism.value == "")
+                {
+                    alert("Please Enter Valid 16S rRNA Sequence for the target organism");
+                    return false;
+                }
+                if (document.form1.nontarget.value == "")
+                {
+                    alert("Please Enter Valid 16S rRNA Sequence for the non target organism");
+                    return false;
+                }
+                if(document.form1.probe.value == "")
+                {
+                    alert("Please Enter Valid Sequence for the probe");
+                    return false;
+                }
+                if(document.form1.compe.value == "")
+                {
+                    alert("Please Enter Valid Sequence for the competitor");
+                    return false;
+                }
+                var org = document.form1.organism.value;
+                if(org.charAt(0)=='>')
+                {
+                    var ret = confirm("FASTA Format Detected. First Line will be removed. \n \n\n               Proceed ?");
+                    if(ret == false)
+                        return false;
+                    else
+                        for (var i=0; i<org.length; i++)
+                    {
+                        if((org.charAt(i) == '\n') || (org.charAt(i)=='\r'))
+                        {
+                            var neworg = org.substring(i+1);
+                            break;
+                        }
+                    }
+
+                    document.form1.organism.value = neworg;
+                }
+                else if(org.search(/origin/i) != -1)
+                {
+                    var start = org.search(/origin/i);
+                    var ret = confirm("GENBANK Format Detected.  Other Details will be removed. \n \n\n               Proceed ?");
+                    if(ret == false)
+                        return false;
+                    else
+                    {
+                        var neworg = org.substring(start+7);
+                        document.form1.organism.value = neworg;
+                    }
+                }
+
+                var j =0;
+                org = document.form1.organism.value;
+                var finalorg = '';
+                while(j < org.length)
+                {
+                    if(isNaN(org.charAt(j)) && (org.charAt(j) != '/'))
+                    {
+                        finalorg += org.charAt(j);
+                    }
+                    j++;
+
+                }
+
+                document.form1.organism.value = finalorg;
+
+
+                var org = document.form1.nontarget.value;
+                if(org.charAt(0)=='>')
+                {
+                    var ret = confirm("FASTA Format Detected. First Line will be removed. \n \n\n               Proceed ?");
+                    if(ret == false)
+                        return false;
+                    else
+                        for (var i=0; i<org.length; i++)
+                    {
+                        if((org.charAt(i) == '\n') || (org.charAt(i)=='\r'))
+                        {
+                            var neworg = org.substring(i+1);
+                            break;
+                        }
+                    }
+
+                    document.form1.nontarget.value = neworg;
+                }
+                else if(org.search(/origin/i) != -1)
+                {
+                    var start = org.search(/origin/i);
+                    var ret = confirm("GENBANK Format Detected.  Other Details will be removed. \n \n\n               Proceed ?");
+                    if(ret == false)
+                        return false;
+                    else
+                    {
+                        var neworg = org.substring(start+7);
+                        document.form1.nontarget.value = neworg;
+                    }
+                }
+
+                var j =0;
+                org = document.form1.nontarget.value;
+                var finalorg = '';
+                while(j < org.length)
+                {
+                    if(isNaN(org.charAt(j)) && (org.charAt(j) != '/'))
+                    {
+                        finalorg += org.charAt(j);
+                    }
+                    j++;
+
+                }
+
+                document.form1.nontarget.value = finalorg;
+
+                j =0;
+                org = document.form1.organism.value;
+                finalorg = '';
+                var flag = 0;
+                while(j < org.length)
+                {
+                    if(org.charAt(j) != '-')
+                    {
+                        finalorg += org.charAt(j);
+                    }
+                    else
+                    {
+                        if(flag==0)
+                        {
+                            alert('Gaps (-) will be removed from Target Organism.');
+                            flag = 1;
+                        }
+                    }
+                    j++;
+                }
+                document.form1.organism.value = finalorg;
+                j =0;
+                org = document.form1.nontarget.value;
+                finalorg = '';
+                var flag = 0;
+                while(j < org.length)
+                {
+                    if(org.charAt(j) != '-')
+                    {
+                        finalorg += org.charAt(j);
+                    }
+                    else
+                    {
+                        if(flag==0)
+                        {
+                            alert('Gaps (-) will be removed from Non-Target Organism.');
+                            flag = 1;
+                        }
+                    }
+                    j++;
+                }
+                document.form1.nontarget.value = finalorg;
+
+                if(document.form1.nontarget.value.length > 3500)
+                {
+                    alert("The length of the Non-Target organism must be less than 3500 !!");
+                    return false;
+                }
+
+                if(document.form1.organism.value.length > 3500)
+                {
+                    alert("The length of the Target organism must be less than 3500 !!");
+                    return false;
+                }
+
+                if(document.form1.probe.value.length > 50)
+                {
+                    alert("The length of the probe must be less than 50 !!");
+                    return false;
+                }
+
+                if(document.form1.compe.value.length > 50)
+                {
+                    alert("The length of the competitor probe must be less than 50 !!");
+                    return false;
+                }
+
+                return true;
+            }
+
+
+            function disable(val)
+            {
+                if(val == 1)
+                {
+                    document.form1.ipprobesequence.disabled=false;
+                    //form1.ipprobesequence.enabled = true;
+                    document.form1.ts1.disabled=true;
+                    document.form1.ts2.disabled=true;
+                    //form1.ts1.enabled = false;
+                    //form1.ts2.enabled = false;
+                    document.form1.ipprobesequence.style.backgroundColor = '#FFFFFF';
+                    document.form1.ts1.style.backgroundColor = '#E5E5E5';
+                    document.form1.ts2.style.backgroundColor = '#E5E5E5';
+                    document.form1.iptargetsequence.style.backgroundColor = '#E5E5E5';
+                    document.form1.iptargetsequence.disabled=true;
+                    //form1.iptargetsequence.enabled = false;
+
+
+                }
+                else if (val == 0)
+                {
+                    document.form1.ipprobesequence.disabled=true;
+                    document.form1.iptargetsequence.disabled=true;
+                    //form1.ipprobesequence.enabled = false;
+                    //form1.iptargetsequence.enabled = false;
+                    document.form1.ts1.disabled=false;
+                    document.form1.ts2.disabled=false;
+                    //form1.ts1.enabled = true;
+                    //form1.ts2.enabled = true;
+                    document.form1.ts1.style.backgroundColor = '#FFFFFF';
+                    document.form1.ts2.style.backgroundColor = '#FFFFFF';
+                    document.form1.ipprobesequence.style.backgroundColor = '#E5E5E5';
+                    document.form1.iptargetsequence.style.backgroundColor = '#E5E5E5';
+
+                }
+                else if (val == 2)
+                {
+                    document.form1.iptargetsequence.disabled=false;
+                    document.form1.ts1.disabled=true;
+                    document.form1.ts2.disabled=true;
+                    //form1.ts1.enabled = false;
+                    //form1.ts2.enabled = false;
+                    //form1.ipprobesequence.enabled = true;
+                    //form1.iptargetsequence.enabled = false;
+                    document.form1.iptargetsequence.style.backgroundColor = '#FFFFFF';
+                    document.form1.ts1.style.backgroundColor = '#E5E5E5';
+                    document.form1.ts2.style.backgroundColor = '#E5E5E5';
+                    document.form1.ipprobesequence.style.backgroundColor = '#E5E5E5';
+                    document.form1.ipprobesequence.disabled=true;
+
+                }
+            }
+            function disabledomain()
+            {
+                if(document.form1.targetmolecule.value == "other")
+                {
+                    document.form1.domain.disabled = true;
+                }
+                else
+                {
+                    document.form1.domain.disabled = false;
+                }
+            }
+		
+function windowOpener(url, name, args) {
+if (typeof(popupWin) != "object"){
+popupWin = window.open(url,name,args);
+} else {
+if (!popupWin.closed){
+popupWin.location.href = url;
+} else {
+popupWin = window.open(url, name,args);
+}
+}
+popupWin.focus();
+}
+
+    </script>
+    </head>
+    <body>
+        <div id = "headimg">
+            <img src="images/uwlogo_web_sm_ctr.png" height="100px" ALT="UW-Madison Logo">
+        </div>
+        <div class="ubercolortabs">
+            <ul>
+                <li><a href="index.html"><span>HOME</span></a></li>
+                <li><a href="helpdocuments.html"><span>HELP</span></a></li>
+                <li><a href="download.html"><span>DOWNLOAD</span></a></li>
+                <li><a href="link.html"><span>LINKS</span></a></li>
+                <li><a href="citation.html"><span>CITATIONS</span></a></li>
+                <li><a href="contact.php"><span>CONTACT</span></a></li>
+            </ul>
+        </div>
+        <br>
+        <br><br><div id="vert_menu">
+            <!--
+   Vertical menu with spans that contain hover description.
+   Right-arrow is a separator for users not viewing style.
+   Added blank li and span in beginning to fix alignment in IE.
+            -->
+            <ul id="vert"><li><span></span></li>
+                <li><a href="probeaff.html"><strong>General Analysis</strong><span>&rarr;Complete  Analysis for any probe-target pair including reaction &#916;G<sup>o</sup>'s,  &#916;G<sup>o</sup>overall, hybridization efficiency, and formamide dissociation  profile.</span></a></li>
+
+                <li><a href="dgovseries.html"><B>&#916;G<sup>o</sup><sub>overall</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>overall</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+                <li><a href="deltaG1.html"><B>&#916;G<sup>o</sup><sub>1</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>1</sub>values for a series of probes of constant length targeting a given region on the organism of interest </span></a></li>
+                <li><a href="deltaG2.html"><B>&#916;G<sup>o</sup><sub>2</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>2</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+                <li><a href="deltaG3.html"><B>&#916;G<sup>o</sup><sub>3</sub> Series</B><span>&rarr; Calculate &#916;G<sup>o</sup><sub>3</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li>
+                <li><a href="mismatch.html">Mismatch Analysis<span>&rarr;Evaluation of mismatch stability and its affect on formamide dissociation for given probe, perfect match target, and mismatched target triplet.</span></a></li>
+                <li><a href="formamide.html">Formamide Curve Generator<span>&rarr;Derivation of formamide dissociation profiles for multiple probe/target pairs.</span></a></li>
+                <li id ="selected"><a href="competitor.html">Competitor Analysis<span>&rarr;The effect of a competitor oligo on the formamide dissociation profile of the probe with both target and non-target.</span></a></li>
+            </ul><ul id="vert2">
+                <li><a href="helpdocuments.html">Help<span>&rarr; Guidelines for mathFISH</span></a></li>
+                <li><a href="link.html">Links<span>&rarr; Links to useful websites</span></a></li>
+                <li><a href="citation.html">Citations<span>&rarr;List of Citations</span></a></li>
+                <li><a href="contact.php">Contact Us<span>&rarr; Give us your valuable feedback</span></a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <center><img src="images/logo.jpg"/></center><br>  			
+			
+            <h1>Competitor Analysis</h1>
+            <hr>
+            <form name ="form1" id = "form1" METHOD = POST ACTION = "compe.php" onsubmit=" return validate()" >
+                <b>
+                    Temperature :&nbsp;&nbsp;<input type="text" name="T" value="46" size="2" />&nbsp;<sup>o</sup>C
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    [ Na <sup> + </sup>] :&nbsp; &nbsp;<input type="text" name="NA" value="1" size="2" >&nbsp;M
+                    <br><br><div class="help">
+                        Probe Concentration :
+                        <input type="text" name="Po" value ="250" size="5" >&nbsp; nM &nbsp; <a href ="#">(?)<span>Typical Range is 250nM to 1000nM.</span></a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        Competitor Concentration : &nbsp;
+                    <input type="text" name="Co" value ="250" size="5" >&nbsp; nM &nbsp;<a href ="#">(?)<span>Typical Range is 250nM to 1000nM.</span></a></div>
+                </b>
+                <br><hr>
+                <b>
+                    Probe Sequence :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    5'&nbsp;<input type="text" name="probe" value ="" size="30">&nbsp;3'
+                    <br><br>
+                    Competitor Sequence :&nbsp;5'&nbsp;<input type="text" name="compe" value ="" size="30" >&nbsp;3'
+                    <hr><br>
+                    <b>
+                        Select your Target Molecule :&nbsp;
+                        <select name = "targetmolecule" onchange="disabledomain()">
+                            <option value = "ssu">Small Subunit rRNA</option>
+                            <option value = "lsu">Large subunit rRNA</option>
+                            <option value = "other">Other</option>
+                        </select>
+                        <br><br>
+                        Select the Domain of life for the Target molecule : &nbsp;
+                        <select name = "domain">
+                            <option value = "b">Bacteria</option>
+                            <option value = "a">Archaea</option>
+                            <option value = "e">Eukarya</option>
+                        </select>
+                        <br>
+                        <br>
+                    </b>
+                    <div class="help">Enter the sequence of the Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div><br><br>
+                    <textarea cols = 60 rows = 5 name = "organism"></textarea>
+                    <br><br>
+                    <div class="help">Enter the sequence of the Non -Target Organism :<a href ="#">(?)<span>Accepts plain text, GenBank and Fasta Format.</span></a></div>
+                    <br>
+                    <br>
+                    <textarea cols = 60 rows = 5 name = "nontarget"></textarea>
+                    <br><br>
+                    <br>
+                </b>
+                <center>
+                <input type="submit" value="SUBMIT" name="submitbutton"></center>
+            </form>
+            <div id ="loadimage">
+                <img src="loading.gif" name = "loadimg" style="display:none" alt="loading image">
+            </div>
+        </div>
+    </body>
+</html> 

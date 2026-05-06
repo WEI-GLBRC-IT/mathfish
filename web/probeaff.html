@@ -1,0 +1,485 @@
+<html><head><title>Calculator</title><meta http-equiv="Content-Type" content="text/html"><link href="style.css" rel="stylesheet" type="text/css"><script type="text/javascript"> 
+            function validate()
+            {
+ 
+                var go = true;
+                var diff = 0;
+                if(document.form1.NA.value == "" || isNaN(document.form1.NA.value))
+                {
+                    alert("Please Enter Valid Number for NA");
+                    return false;
+                }
+                if(parseFloat(document.form1.NA.value) > 1 || parseFloat(document.form1.NA.value) < 0.1)
+                {
+                    alert("[Na+] should be in the 0.1-1M range");
+                    return false
+                }
+                if(document.form1.T.value == "" || isNaN(document.form1.T.value))
+                {
+                    alert("Please Enter Valid Number for Temperature");
+                    return false;
+                }
+                if(document.form1.Po.value == "" || isNaN(document.form1.Po.value))
+                {
+                    alert("Please Enter Valid Number for Probe Concentration");
+                    return false;
+                }
+                if (document.form1.organism.value == "")
+                {
+                    alert("Please Enter Valid 16S rRNA Sequence");
+                    return false;
+                }
+                if(document.form1.entry[2].checked)
+                {
+                    if(document.form1.ipprobesequence.value == "")
+                    {
+                        alert("Please Enter Valid Sequence for the probe");
+                        return false;
+                    }
+                    diff = document.form1.ipprobesequence.value.length;
+                    if(diff > 50)
+                    {
+                        alert("The length of the probe must be less than 50 !!");
+                        return false;
+                    }
+                }
+                if(document.form1.entry[1].checked)
+                {
+                    if(document.form1.iptargetsequence.value == "")
+                    {
+                        alert("Please Enter Valid Sequence for the target site");
+                        return false;
+                    }
+                    diff = document.form1.iptargetsequence.value.length;
+                    if(diff > 50)
+                    {
+                        alert("The length of the target site must be less than 50 !!");
+                        return false;
+                    }
+                }
+                if(document.form1.entry[0].checked)
+                {
+                    if (document.form1.ts1.value == "" || isNaN(document.form1.ts1.value))
+                    {
+                        alert("Please Enter Valid Number for 5' end");
+                        return false;
+                    }
+                    if (document.form1.ts2.value == "" || isNaN(document.form1.ts2.value))
+                    {
+                        alert("Please Enter Valid Number for 3' end");
+                        return false;
+                    }
+                    if (parseFloat(document.form1.ts1.value) < 0 || parseFloat(document.form1.ts2.value) < 0)
+                    {
+                        alert ("Please Enter Positive Numbers for 5' and 3' ends");
+                        return false;
+                    }
+                    if (parseFloat(document.form1.ts1.value) > parseFloat(document.form1.ts2.value))
+                    {
+                        alert("3' value should be greater than 5' value");
+                        return false;
+                    }
+                    if(parseFloat(document.form1.ts2.value) > parseFloat(document.form1.organism.value.length))
+                    {
+                        alert("Target site position must be inside the organism sequence");
+                        return false;
+                    }
+                    diff = parseFloat(document.form1.ts2.value) - parseFloat(document.form1.ts1.value);
+                }
+                if(diff > 35)
+                {
+                    go = confirm("Target/Probe Length too long (> 35). Do you want to continue ??");
+                }
+                else if (diff < 15)
+                {
+                    go = confirm("Target/Probe Length too short (< 15). Do you want to continue ??");
+                }
+                if(go == true )
+                {
+                    //document.loadimg.style.display = '';
+                    var org = document.form1.organism.value;
+                    if(org.charAt(0)=='>')
+                    {
+                        var ret = confirm("FASTA Format Detected. First Line will be removed. \n \n\n               Proceed ?");
+                        if(ret == false)
+                            return false;
+                        else
+                            for (var i=0; i<org.length; i++)
+                        {
+                            if((org.charAt(i) == '\n') || (org.charAt(i)=='\r'))
+                            {
+                                var neworg = org.substring(i+1);
+                                break;
+                            }
+                        }
+ 
+                        document.form1.organism.value = neworg;
+                    }
+                    else if(org.search(/origin/i) != -1)
+                    {
+                        var start = org.search(/origin/i);
+                        var ret = confirm("GENBANK Format Detected.  Non-DNA characters will be removed. \n \n\n               Proceed ?");
+                        if(ret == false)
+                            return false;
+                        else
+                        {
+                            var neworg = org.substring(start+7);
+                            document.form1.organism.value = neworg;
+                        }
+                    }
+ 
+                    var j =0;
+                    var org = document.form1.organism.value;
+                    var finalorg = '';
+                    while(j < org.length)
+                    {
+                        if(isNaN(org.charAt(j)) && (org.charAt(j) != '/'))
+                        {
+                            finalorg += org.charAt(j);
+                        }
+                        j++;
+ 
+                    }
+ 
+                    document.form1.organism.value = finalorg;
+ 
+                    //New entry to avoid foreign characters in probe sequence
+                    if(document.form1.entry[2].checked)
+                    {
+                        j=0;
+                        var finalpro='';
+                        var pro =  document.form1.ipprobesequence.value;
+                        pro = pro.toUpperCase();
+                        while(j < pro.length)
+                        {
+                        if(pro.charAt(j)!='I' && pro.charAt(j)!='M' && pro.charAt(j)!='R' && pro.charAt(j)!='W' && pro.charAt(j)!='S' && pro.charAt(j)!='Y'                          && pro.charAt(j)!='K' && pro.charAt(j)!='V' && pro.charAt(j)!='H' && pro.charAt(j)!='D' && pro.charAt(j)!='B' && pro.charAt(j)!='N' &&				pro.charAt(j) != 'A' && pro.charAt(j) != 'C' && pro.charAt(j) != 'G' && pro.charAt(j) != 'T' && pro.charAt(j) != ' ')
+			{
+				
+                           alert("Probe sequence has a non-IUPAC character(s).\nPlease re-enter the probe sequence.");
+                           return false;
+                          }
+                            j++;
+                        }
+			j=0;
+			while(j < pro.length)
+                        {
+                         if(pro.charAt(j)=='I' || pro.charAt(j)=='M' || pro.charAt(j)=='R' || pro.charAt(j)=='W' || pro.charAt(j)=='S' || pro.charAt(j)=='Y'                          || pro.charAt(j)=='K' || pro.charAt(j)=='V' || pro.charAt(j)=='H' || pro.charAt(j)=='D' || pro.charAt(j)=='B' || pro.charAt(j)=='N')
+			    {
+				//alert("Probe sequence has IUPAC characters other than base codes, space, and gaps. \n Please check the probe sequence and 					resubmit.");
+                                //window.open('table_iupac_codes.html','IUPAC Codes','width=550,height=550');
+				windowOpener('table_iupac_codes.html','IUPAC Codes', 'width=550,height=550');
+				return false;
+
+			    }
+                            
+                            if(pro.charAt(j)!=' ')
+                            {
+                                finalpro+=pro.charAt(j);
+                            }
+                            j++;
+                        }
+
+                        document.form1.ipprobesequence.value=finalpro;
+                    }
+ 
+ 
+                    j =0;
+                    org = document.form1.organism.value;
+                    finalorg = '';
+                    var flag = 0;
+                    while(j < org.length)
+                    {
+                        if(org.charAt(j) != '-')
+                        {
+                            finalorg += org.charAt(j);
+                        }
+                        else
+                        {
+                            if(flag==0)
+                            {
+                                alert('Gaps (-) will be removed from Target Organism.');
+                                flag = 1;
+                            }
+                        }
+                        j++;
+                    }
+ 
+                    document.form1.organism.value = finalorg;
+ 
+ 
+                    if(document.form1.organism.value.length > 3500)
+                    {
+                        alert("The length of the Target organism must be less than 3500 !!");
+                        return false;
+                    }
+ 
+                    if(document.form1.entry[1].checked)
+                    {
+                        j=0;
+                        var finaltar='';
+                        var tar =  document.form1.iptargetsequence.value;
+                        tar = tar.toUpperCase();
+                        while(j < tar.length)
+                        {
+                        if(tar.charAt(j)!='I' && tar.charAt(j)!='M' && tar.charAt(j)!='R' && tar.charAt(j)!='W' && tar.charAt(j)!='S' && tar.charAt(j)!='Y'                          && tar.charAt(j)!='K' && tar.charAt(j)!='V' && tar.charAt(j)!='H' && tar.charAt(j)!='D' && tar.charAt(j)!='B' && tar.charAt(j)!='N' &&				tar.charAt(j) != 'A' && tar.charAt(j) != 'C' && tar.charAt(j) != 'G' && tar.charAt(j) != 'T' && tar.charAt(j) != ' ')
+			{
+				
+                           alert("Target sequence has a non-IUPAC character(s).\nPlease re-enter the Target sequence.");
+                           return false;
+                          }
+                            j++;
+                        }
+			j=0;
+			while(j < tar.length)
+                        {
+                         if(tar.charAt(j)=='I' || tar.charAt(j)=='M' || tar.charAt(j)=='R' || tar.charAt(j)=='W' || tar.charAt(j)=='S' || tar.charAt(j)=='Y'                          || tar.charAt(j)=='K' || tar.charAt(j)=='V' || tar.charAt(j)=='H' || tar.charAt(j)=='D' || tar.charAt(j)=='B' || tar.charAt(j)=='N')
+			    {
+				//alert("Target sequence has IUPAC characters other than base codes, space, and gaps. \n Please check the Target sequence and 					resubmit.");
+                                //window.open('table_iupac_codes.html','IUPAC Codes','width=550,height=550');
+				windowOpener('table_iupac_codes.html','IUPAC Codes', 'width=550,height=550');
+				return false;
+
+			    }
+                            
+                            if(tar.charAt(j)!=' ')
+                            {
+                                finaltar+=tar.charAt(j);
+                            }
+                            j++;
+                        }
+                        document.form1.iptargetsequence.value=finaltar;
+ 
+                        var tar =  document.form1.iptargetsequence.value;
+                        tar = tar.toUpperCase();
+                        var org = finalorg;
+                        org = org.toUpperCase();
+                        if(org.search(tar)== -1)
+                        {
+                            alert("Target Sequence not present inside the Organism sequence");
+                            return false;
+                        }
+                    }
+ 
+                    if(document.form1.entry[0].checked){
+                        var fiveprime = parseInt(document.form1.ts1.value);
+                        var threeprime = parseInt(document.form1.ts2.value);
+                        var org = document.form1.organism.value.toUpperCase();
+                        for(var j=fiveprime-1;j<threeprime;j++)
+                        {
+                            if (org.charAt(j) != 'U' && org.charAt(j) != 'A' && org.charAt(j) != 'C' && org.charAt(j) != 'G' && org.charAt(j) != 'T' && org.charAt(j) != ' ')
+                            {
+                                alert("Organism sequence has a non-ACTG character(s).\nIf this is because of degenerate positions, please try the different combinations separately.");
+                                return false;
+                            }
+                        }
+                    }
+ 
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+ 
+ 
+            function disable(val)
+            {
+                if(val == 1)
+                {
+                    document.form1.ipprobesequence.disabled=false;
+                    //form1.ipprobesequence.enabled = true;
+                    document.form1.ts1.disabled=true;
+                    document.form1.ts2.disabled=true;
+                    //form1.ts1.enabled = false;
+                    //form1.ts2.enabled = false;
+                    document.form1.ipprobesequence.style.backgroundColor = '#FFFFFF';
+                    document.form1.ts1.style.backgroundColor = '#E5E5E5';
+                    document.form1.ts2.style.backgroundColor = '#E5E5E5';
+                    document.form1.iptargetsequence.style.backgroundColor = '#E5E5E5';
+                    document.form1.iptargetsequence.disabled=true;
+                    //form1.iptargetsequence.enabled = false;
+ 
+ 
+                }
+                else if (val == 0)
+                {
+                    document.form1.ipprobesequence.disabled=true;
+                    document.form1.iptargetsequence.disabled=true;
+                    //form1.ipprobesequence.enabled = false;
+                    //form1.iptargetsequence.enabled = false;
+                    document.form1.ts1.disabled=false;
+                    document.form1.ts2.disabled=false;
+                    //form1.ts1.enabled = true;
+                    //form1.ts2.enabled = true;
+                    document.form1.ts1.style.backgroundColor = '#FFFFFF';
+                    document.form1.ts2.style.backgroundColor = '#FFFFFF';
+                    document.form1.ipprobesequence.style.backgroundColor = '#E5E5E5';
+                    document.form1.iptargetsequence.style.backgroundColor = '#E5E5E5';
+ 
+                }
+                else if (val == 2)
+                {
+                    document.form1.iptargetsequence.disabled=false;
+                    document.form1.ts1.disabled=true;
+                    document.form1.ts2.disabled=true;
+                    //form1.ts1.enabled = false;
+                    //form1.ts2.enabled = false;
+                    //form1.ipprobesequence.enabled = true;
+                    //form1.iptargetsequence.enabled = false;
+                    document.form1.iptargetsequence.style.backgroundColor = '#FFFFFF';
+                    document.form1.ts1.style.backgroundColor = '#E5E5E5';
+                    document.form1.ts2.style.backgroundColor = '#E5E5E5';
+                    document.form1.ipprobesequence.style.backgroundColor = '#E5E5E5';
+                    document.form1.ipprobesequence.disabled=true;
+ 
+                }
+            }
+            function disabledomain()
+            {
+                if(document.form1.targetmolecule.value == "other")
+                {
+                    document.form1.domain.disabled = true;
+                }
+                else
+                {
+                    document.form1.domain.disabled = false;
+                }
+            }
+ 
+            function disablecheck()
+            {
+                var val=-1;
+                if(document.form1.entry[1].checked)
+                    val = 2;
+                if(document.form1.entry[2].checked)
+                    val = 1;
+                if(document.form1.entry[0].checked)
+                    val = 0;
+ 
+                disable(val);
+ 
+            }
+
+function windowOpener(url, name, args) {
+if (typeof(popupWin) != "object"){
+popupWin = window.open(url,name,args);
+} else {
+if (!popupWin.closed){ 
+popupWin.location.href = url;
+} else {
+popupWin = window.open(url, name,args);
+}
+}
+popupWin.focus();
+}
+ 
+ 
+        </script></head><body onload="disablecheck()"> 
+        <div id="headimg"> 
+            <img src="images/uwlogo_web_sm_ctr.png" height="100px" alt="UW-Madison Logo">
+        </div> 
+        <div class="ubercolortabs"> 
+            <ul> 
+                <li><a href="index.html"><span>HOME</span></a></li> 
+                <li><a href="helpdocuments.html"><span>HELP</span></a></li> 
+                <li><a href="download.html"><span>DOWNLOAD</span></a></li> 
+                <li><a href="link.html"><span>LINKS</span></a></li> 
+                <li><a href="citation.html"><span>CITATIONS</span></a></li> 
+                <li><a href="contact.php"><span>CONTACT</span></a></li> 
+            </ul> 
+        </div> 
+        <br> 
+        <br><br><div id="vert_menu"> 
+            <!--
+   Vertical menu with spans that contain hover description.
+   Right-arrow is a separator for users not viewing style.
+   Added blank li and span in beginning to fix alignment in IE.
+            --> 
+            <ul id="vert"><li><span></span></li> 
+                <li id="selected"><a href="probeaff.html"><strong>General Analysis</strong><span>&rarr;Complete  Analysis for any probe-target pair including reaction &Delta;G<sup>o</sup>'s,  &Delta;G<sup>o</sup>overall, hybridization efficiency, and formamide dissociation  profile.</span></a></li> 
+ 
+                <li><a href="dgovseries.html"><b>&Delta;G<sup>o</sup><sub>overall</sub> Series</b><span>&rarr; Calculate &Delta;G<sup>o</sup><sub>overall</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li> 
+                <li><a href="deltaG1.html"><b>&Delta;G<sup>o</sup><sub>1</sub> Series</b><span>&rarr; Calculate &Delta;G<sup>o</sup><sub>1</sub>values for a series of probes of constant length targeting a given region on the organism of interest </span></a></li> 
+                <li><a href="deltaG2.html"><b>&Delta;G<sup>o</sup><sub>2</sub> Series</b><span>&rarr; Calculate &Delta;G<sup>o</sup><sub>2</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li> 
+                <li><a href="deltaG3.html"><b>&Delta;G<sup>o</sup><sub>3</sub> Series</b><span>&rarr; Calculate &Delta;G<sup>o</sup><sub>3</sub>values for a series of probes of constant length targeting a given region on the organism of interest</span></a></li> 
+                <li><a href="mismatch.html">Mismatch Analysis<span>&rarr;Evaluation of mismatch stability and its affect on formamide dissociation for given probe, perfect match target, and mismatched target triplet.</span></a></li> 
+                <li><a href="formamide.html">Formamide Curve Generator<span>&rarr;Derivation of formamide dissociation profiles for multiple probe/target pairs.</span></a></li> 
+                <li><a href="competitor.html">Competitor Analysis<span>&rarr;The effect of a competitor oligo on the formamide dissociation profile of the probe with both target and non-target.</span></a></li> 
+            </ul><ul id="vert2"> 
+                <li><a href="helpdocuments.html">Help<span>&rarr; Guidelines for mathFISH</span></a></li> 
+                <li><a href="link.html">Links<span>&rarr; Links to useful websites</span></a></li> 
+                <li><a href="citation.html">Citations<span>&rarr;List of Citations</span></a></li> 
+                <li><a href="contact.php">Contact Us<span>&rarr; Give us your valuable feedback</span></a></li> 
+            </ul> 
+        </div> 
+        <div id="content"> 
+            <center><img src="images/logo.jpg"></center><br> 
+            <h1>General Analysis</h1><br><br> 
+            <hr><br> 
+            <form name="form1" id="form1" method="POST" action="Step2.php" onsubmit=" return validate()"> 
+                <b><div class="help"> 
+                        Temperature:  <input type="text" name="T" value="46" size="2"> <sup>o</sup>C
+                             
+                        [ Na <sup> + </sup>]:   <input type="text" name="NA" value="1" size="2"> M
+                             
+                        Probe Concentration :  
+                    <input type="text" name="Po" value="250" size="2"> nM <a href="#">(?)<span>Typical Range is 250nM to 1000nM.</span></a></div> 
+                    <!-- <select name="Po_units">
+                        <option value="nm">nM</option>
+                        <option value="ng">nGrams/&mu;L</option>
+                    </select> --> 
+                </b> 
+                <br><br><hr><br> 
+                <b> 
+                    Select Target Site Position     
+                    <input type="radio" name="entry" id="entry" value="t" onclick="disable(0)" checked="checked"> 
+                        Enter targetsite :        
+                    5' end : <input type="text" name="ts1" value="" size="3"> 
+                         
+                    3' end : <input type="text" name="ts2" value="" size="3"> 
+                    <br> 
+                                   OR <br> 
+                    Target Site Sequence Entry  
+                    <input type="radio" name="entry" id="entry" value="s" onclick="disable(2)"> 
+                       
+                    Target Site Sequence : 5' <input type="text" name="iptargetsequence" value="" size="25" disabled="disabled"> 3'
+                    <br> 
+                                   OR <br> 
+                    Probe Sequence Entry          
+                    <input type="radio" name="entry" id="entry" value="p" onclick="disable(1)"> 
+                       
+                    Probe Sequence :         5' <input type="text" name="ipprobesequence" value="" size="25" disabled="disabled"> 3'
+                </b> 
+                <br><br><hr><br> 
+                <b> 
+                    Select your Target Molecule : 
+                    <select name="targetmolecule" onchange="disabledomain()"> 
+                        <option value="ssu">Small Subunit rRNA</option> 
+                        <option value="lsu">Large subunit rRNA</option> 
+                        <option value="other">Other</option> 
+                    </select> 
+                    <br><br> 
+                    Select the Domain of life for the Target molecule :  
+                    <select name="domain"> 
+                        <option value="b">Bacteria</option> 
+                        <option value="a">Archaea</option> 
+                        <option value="e">Eukarya</option> 
+                    </select> 
+                    <br> 
+                    <br> 
+                    <div class="help">Enter the sequence of the Target Organism :<a href="#">(?)<span>    Accepts plain text, GenBank and Fasta Format. Gaps will be removed.</span></a></div> 
+                    <br> 
+                    <br> 
+                    <textarea cols="60" rows="5" name="organism"></textarea> 
+                </b><br><br> 
+                <center> 
+                <input type="submit" value="SUBMIT" name="submitbutton"></center> 
+            </form> 
+            <div id="loadimage"> 
+                <img src="loading.gif" name="loadimg" style="display:none" alt="loading image"> 
+            </div> 
+            <br><br><br><br><br><br><br><br><br><br> 
+            <br><br><br><br><br><br><br><br><br><br> 
+        </div> 
+    </body></html>

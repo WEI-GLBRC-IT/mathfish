@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+# Python
+*.pyo
+*.pyc
+__pycache__/
+# dependency builds
+dependencies/*
+# site testing data
+text/probe.37.ext
+text/probe.37.plot
+text/probe.ct
+text/probe.dG
+text/probe.run
+# userdata from tests and live queries
+web/userFiles/*.csv
+web/userFiles/*.dnd
+web/userFiles/*.gde
+web/userFiles/*.png
+web/userFiles/*.txt
+# PHP and server info
+web/info.php
+# Ignore everything in web/log/
+web/log/*
+# But do not ignore this file
+!web/log/index.html

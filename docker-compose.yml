@@ -1,0 +1,15 @@
+services:
+  mathfish:
+    build: .
+    platform: linux/amd64
+    container_name: mathfish
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      - TZ=America/Chicago
+    # Optional: mount userFiles for debugging (files persist between restarts)
+    # Note: if mounting, ensure directory exists and is writable by uid 33 (www-data)
+    #   mkdir -p ./userFiles && chmod 777 ./userFiles
+    # volumes:
+    #   - ./userFiles:/var/www/html/userFiles
