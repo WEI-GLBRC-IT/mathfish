@@ -4,8 +4,9 @@
 *.pyo
 *.pyc
 __pycache__/
-# dependency builds
+# dependency builds (UNAFold is user-supplied; ClustalW we bundle)
 dependencies/*
+!dependencies/clustalw-2.1.tar.gz
 # site testing data
 text/probe.37.ext
 text/probe.37.plot

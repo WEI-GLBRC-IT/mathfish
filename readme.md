@@ -69,11 +69,10 @@ mathfish/
 
 ### Obtain the UNAFold tarball
 
-UNAFold's license does not permit redistribution, so this repository does not include it. Before building the image you must obtain a copy yourself:
+UNAFold's license does not permit redistribution, so this repository does not include it. **mathFISH was built and validated against UNAFold 3.3 source; we have not tested it against UNAFold 4.0.** You will need to obtain a copy yourself.
 
-1. Register at [unafold.org](https://www.unafold.org/) under your institution's academic license.
-2. Download `unafold-3.3.tar.gz`.
-3. Place it at `./dependencies/unafold-3.3.tar.gz`.
+1. Licensing is handled by **RPI's Office of Technology Commercialization** — email **burtok2@rpi.edu** (or call 518-276-3675). RPI's project page: <https://ipo.rpi.edu/invention/unafold-version-40>.
+2. Place the tarball at `./dependencies/unafold-3.3.tar.gz`. If you obtain a different 3.x point release, rename the tarball to `unafold-3.3.tar.gz` *and* arrange for the extracted directory to be named `unafold-3.3` so the Dockerfile's `COPY` / `tar -xzf` / `cd unafold-3.3` steps still work — the cleanest way is to extract, rename the directory to `unafold-3.3`, then re-tar.
 
 The Dockerfile compiles UNAFold from this tarball at build time and bakes the resulting binaries into the image. The tarball stays out of git via `.gitignore`, so it persists across `git pull` and won't be accidentally committed.
 
