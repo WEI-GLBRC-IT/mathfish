@@ -57,7 +57,7 @@
 <div id="content">
 
 <?php
-if (!empty($_POST['organism']) && strlen($_POST['organism']) > 3500) {
+if (!empty($_POST['organism']) && (!is_string($_POST['organism']) || strlen($_POST['organism']) > 3500)) {
     echo "Long sequence error!! organism is not allowed to be longer than 3500";
     exit;
 }
@@ -108,18 +108,23 @@ $output=shell_exec($cmd);
 
 // Collect the output
 $filePath = "userFiles/outputVars_".$randomString. ".txt";
-$content = file_get_contents($filePath);
 
 if (!file_exists($filePath) || filesize($filePath) == 0) {
     echo "<span style='font-size: 14px; color: red;'>Error encountered. Please email the developer with code: <b>$randomString</b></span>";
     exit;
 }
-
+$content = file_get_contents($filePath);
 $vars = explode(";", $content);
 
 // Check if content contains "ERROR"
 if (strpos($vars[0], "ERROR") !== false) {
     echo "<span style='font-size: 14px; color: red;'><b>$vars[0]</b></span>";
+    exit;
+}
+
+// A short result means the script failed part-way; PHP 8 warns on missing keys.
+if (count($vars) < 2) {
+    echo "<span style='font-size: 14px; color: red;'>Error encountered. Please email the developer with code: <b>$randomString</b></span>";
     exit;
 }
 

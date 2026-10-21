@@ -9,6 +9,19 @@ This document describes how to validate a running mathFISH container. Each of th
 ```bash
 docker cp tests/run_cli_tests.sh mathfish:/tmp/run_cli_tests.sh
 docker exec -w /var/www/html mathfish bash /tmp/run_cli_tests.sh > tests.out
+python3 tests/compare_cli_output.py tests/expected_cli.out tests.out
+```
+
+`compare_cli_output.py` checks the run against `expected_cli.out`, the output of the last PHP 7.4 / numpy 1.19 image. Text must match exactly; numbers must match to 1e-9 relative, which absorbs last-digit drift between numpy builds. It prints how many numbers it compared, and exits non-zero on any mismatch or on empty output. CI runs it on every build.
+
+## Posting the forms through Apache + PHP
+
+The CLI suite calls the Python scripts directly, so it never exercises PHP. `tests/run_http_tests.sh` posts each of the 8 forms with the same inputs. A page passes on HTTP 200, no error text, and every linked plot downloading as a PNG. PHP warnings go to the Apache error log rather than the page, so check that too:
+
+```bash
+docker cp tests/run_http_tests.sh mathfish:/tmp/run_http_tests.sh
+docker exec mathfish bash /tmp/run_http_tests.sh          # expect "pages checked: 8, passed: 8"
+docker logs mathfish 2>&1 | grep -cE 'PHP (Parse error|Fatal error|Warning|Deprecated|Notice)'   # expect 0
 ```
 
 ## Feature Tests

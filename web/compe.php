@@ -94,7 +94,7 @@ $var2len = [
 ];
 
 foreach ($var2len as $var => $maxlen) {
-    if (isset($_POST[$var]) && strlen($_POST[$var]) > $maxlen) {
+    if (isset($_POST[$var]) && (!is_string($_POST[$var]) || strlen($_POST[$var]) > $maxlen)) {
         echo "Long sequence error!! $var sequence is not allowed to be longer than $maxlen";
         exit;
     }
@@ -141,14 +141,19 @@ $output=shell_exec($cmd);
 
 // Collect the output
 $filePath = "userFiles/outputVars_".$randomString. ".txt";
-$content = file_get_contents($filePath);
 
 if (!file_exists($filePath) || filesize($filePath) == 0) {
     echo "<span style='font-size: 14px; color: red;'>Error encountered. Please email the developer with code: <b>$randomString</b></span>";
     exit;
 }
-
+$content = file_get_contents($filePath);
 $vars = explode(";", $content);
+
+// A short result means the script failed part-way; PHP 8 warns on missing keys.
+if (count($vars) < 25) {
+    echo "<span style='font-size: 14px; color: red;'>Error encountered. Please email the developer with code: <b>$randomString</b></span>";
+    exit;
+}
 
 // echo $vars[0]."<br>";
 // echo $vars[1]."<br>";

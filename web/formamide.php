@@ -92,7 +92,7 @@ $var2len = [
 foreach ($var2len as $var => $maxlen) {
     if (!empty($_POST[$var]) && is_array($_POST[$var])) {
         foreach ($_POST[$var] as $idx => $value) {
-            if (strlen($value) > $maxlen) {
+            if (!is_string($value) || strlen($value) > $maxlen) {
                 echo "Long sequence error!! $var sequence is not allowed to be longer than $maxlen";
                 exit;
             }
@@ -131,9 +131,10 @@ foreach ($varNames as $varName) {
 }
 
 // Parse selected indices
-$checked_indices = explode(" ", trim($_POST['chkdata']));
-$organisms = $_POST['organism'];
-$probes = $_POST['probe'];
+$chkdata = $_POST['chkdata'] ?? '';
+$checked_indices = explode(" ", trim(is_string($chkdata) ? $chkdata : ''));
+$organisms = is_array($_POST['organism'] ?? null) ? $_POST['organism'] : [];
+$probes = is_array($_POST['probe'] ?? null) ? $_POST['probe'] : [];
 
 // Write probes
 fwrite($file, "VAR_probes\n");
@@ -170,14 +171,19 @@ $output=shell_exec($cmd);
 
 // Collect the output
 $filePath = "userFiles/outputVars_".$randomString. ".txt";
-$content = file_get_contents($filePath);
 
 if (!file_exists($filePath) || filesize($filePath) == 0) {
     echo "<span style='font-size: 14px; color: red;'>Error encountered. Please email the developer with code: <b>$randomString</b></span>";
     exit;
 }
-
+$content = file_get_contents($filePath);
 $vars = explode(";", $content);
+
+// A short result means the script failed part-way; PHP 8 warns on missing keys.
+if (count($vars) < 2) {
+    echo "<span style='font-size: 14px; color: red;'>Error encountered. Please email the developer with code: <b>$randomString</b></span>";
+    exit;
+}
 
 // echo $vars[0]."<br>";
 // echo $vars[1]."<br>";

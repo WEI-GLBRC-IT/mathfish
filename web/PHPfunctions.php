@@ -11,6 +11,10 @@
 
 	//ATTACK PREVENTION
 	function fstripCommandTricks($string){
+		// Array input (name[]=...) would otherwise reach the file as "Array".
+		if (!is_string($string)) {
+			return '';
+		}
 		$string=preg_replace('/"/','',$string);
 		$string=preg_replace('/&/','',$string);
 		$string=preg_replace('/\//','',$string);

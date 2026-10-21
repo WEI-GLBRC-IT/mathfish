@@ -6,7 +6,7 @@ Web application for calculating thermodynamic parameters of FISH (Fluorescence I
 
 - [Design](#design)
   - [Components](#components)
-  - [Why these versions are pinned](#why-these-versions-are-pinned)
+  - [Version choices](#version-choices)
   - [Repository layout](#repository-layout)
 - [Install and Run](#install-and-run)
   - [Prerequisites](#prerequisites)
@@ -25,18 +25,22 @@ mathFISH ships as a single Docker image. The image is built locally from a UNAFo
 
 | Component  | Version | Source           | Purpose                                                  |
 |------------|---------|------------------|----------------------------------------------------------|
-| PHP        | 7.4     | `php:7.4-apache` | Web frontend                                             |
-| Apache     | 2.4     | `php:7.4-apache` | Web server                                               |
-| Python     | 3.9     | Debian bullseye  | Computation scripts                                      |
-| numpy      | 1.19.5  | pip              | Numerical computing                                      |
-| matplotlib | 3.3.4   | pip              | Plot generation                                          |
-| Pillow     | 8.4.0   | pip              | Image processing                                         |
+| PHP        | 8.4 (≥ 8.4.27) | `php:8.4-apache-bookworm` | Web frontend                                |
+| Apache     | 2.4     | `php:8.4-apache-bookworm` | Web server                                      |
+| Python     | 3.11    | Debian bookworm  | Computation scripts                                      |
+| numpy      | 1.24    | Debian bookworm  | Numerical computing                                      |
+| matplotlib | 3.6     | Debian bookworm  | Plot generation                                          |
 | ClustalW2  | 2.1     | `dependencies/`  | Pairwise sequence alignment (tarball in repo already)    |
 | UNAFold    | 3.3     | user-supplied    | Nucleic acid folding (`hybrid-ss-min`, `hybrid-2s.pl`)   |
 
-### Why these versions are pinned
+### Version choices
 
-The image builds from the `php:7.4-apache` upstream base, which fixes PHP to 7.4.33 and Apache to 2.4.54 (on Debian bullseye). PHP 7.4 is the last interpreter version mathFISH has been validated against — patterns used in the frontend (`preg_replace`, array indexing style, implicit `{$var}` interpolation) have been deprecated or removed in newer PHP, and the frontend has not been retested under 8.x. Python pins ride along: bullseye ships Python 3.9.2, and the `numpy 1.19.5` / `matplotlib 3.3.4` / `Pillow 8.4.0` triple is the pip-installable set that's ABI-compatible with that interpreter and produces the plots matching the upstream mathFISH publication. Bumping any of these should be done deliberately, with a full pass of [tests/TESTING.md](tests/TESTING.md) before trusting the result.
+- **PHP 8.4, at least 8.4.27.** The image builds from `php:8.4-apache-bookworm`, which follows 8.4 patch releases. A build step fails on anything older than 8.4.27, the release that fixed PHP2Shell (CVE-2026-109618, CVE-2026-109619). PHP 8.4 gets security fixes until 31 Dec 2028.
+- **Debian bookworm, not trixie.** Bookworm's gcc 12 compiles UNAFold 3.3's old C; trixie's gcc 14 is stricter and untested here.
+- **numpy and matplotlib from Debian packages.** Bookworm's pip refuses system-wide installs.
+- **Results unchanged from the PHP 7.4 / numpy 1.19 image (checked 2026-10).** All 8 CLI cases match its output ([tests/expected_cli.out](tests/expected_cli.out)): text identical, 342 of 972 numbers moved in the last digits, at most 4.2e-14 relative. CI repeats this check on every build.
+
+Re-run [tests/TESTING.md](tests/TESTING.md) in full before trusting any other version change.
 
 ### Repository layout
 
@@ -49,9 +53,12 @@ mathfish/
 ├── dependencies/            # build inputs
 │   ├── clustalw-2.1.tar.gz  # committed (permissive license, ships in Bioconda)
 │   └── unafold-3.3.tar.gz   # NOT committed (licensed); placed by user before build
+├── docker/                  # PHP ini and Apache conf copied into the image
 ├── tests/                   # smoke tests + per-feature procedures
 │   ├── TESTING.md
-│   ├── run_cli_tests.sh
+│   ├── run_cli_tests.sh     # runs the Python scripts directly
+│   ├── run_http_tests.sh    # posts every form through Apache + PHP
+│   ├── compare_cli_output.py, expected_cli.out  # CLI results vs the reference output
 │   └── …test fixtures
 └── web/                     # application code copied into the image at /var/www/html/
     ├── *.php                # frontend pages
@@ -156,11 +163,20 @@ See [tests/TESTING.md](tests/TESTING.md) for:
 - Expected output values for validation
 - A copy-pasteable General Analysis smoke test
 
-To run all 8 CLI cases against the running container and produce a single log:
+To run all 8 CLI cases against the running container and compare them with the reference output:
 
 ```bash
 docker cp tests/run_cli_tests.sh mathfish:/tmp/run_cli_tests.sh
 docker exec -w /var/www/html mathfish bash /tmp/run_cli_tests.sh > tests.out
+python3 tests/compare_cli_output.py tests/expected_cli.out tests.out
+```
+
+To post all 8 forms through Apache and PHP, then check the error log for PHP warnings:
+
+```bash
+docker cp tests/run_http_tests.sh mathfish:/tmp/run_http_tests.sh
+docker exec mathfish bash /tmp/run_http_tests.sh
+docker logs mathfish 2>&1 | grep -cE 'PHP (Parse error|Fatal error|Warning|Deprecated|Notice)'   # expect 0
 ```
 
 ## Troubleshooting
