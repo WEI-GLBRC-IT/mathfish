@@ -23,15 +23,25 @@ COMPE='GCAGCCACACTGGAACTGAGACAC'
 checked=0
 passed=0
 
-# check_page <name> <page.php> <curl --data-urlencode args...>
+# check_page <name> <page.php> <curl --data-urlencode args...> [--expect-alignments N]
+# --expect-alignments N: the page must show exactly N "PROBE ALIGNMENT WITH TARGET ORGANISM" blocks.
 check_page() {
     local name="$1"; shift
     local page="$1"; shift
-    local body code fail="" plots=0 src got
+    local body code fail="" plots=0 src got want="" n
+    local args=()
+    while [ $# -gt 0 ]; do
+        if [ "$1" = --expect-alignments ]; then want="$2"; shift 2; else args+=("$1"); shift; fi
+    done
     checked=$((checked + 1))
     body=$(mktemp)
 
-    code=$(curl -sS -o "$body" -w '%{http_code}' "$@" "$BASE/$page") || fail="curl failed"
+    code=$(curl -sS -o "$body" -w '%{http_code}' "${args[@]}" "$BASE/$page") || fail="curl failed"
+    if [ -n "$want" ]; then
+        # grep -o | wc -l, not grep -c: the page prints every block on ONE line.
+        n=$(grep -o 'PROBE ALIGNMENT WITH TARGET ORGANISM' "$body" | wc -l | tr -d ' ')
+        [ "$n" = "$want" ] || fail="${fail:+$fail; }$n alignment block(s), expected $want"
+    fi
     [ "$code" = 200 ] || fail="${fail:+$fail; }HTTP $code"
     if grep -qE 'Error encountered|Long sequence error|Image not found|<b>(Warning|Fatal error|Deprecated|Notice)</b>' "$body"; then
         fail="${fail:+$fail; }error text in page: $(grep -oE 'Error encountered|Long sequence error|Image not found|<b>(Warning|Fatal error|Deprecated|Notice)</b>' "$body" | head -1)"
@@ -64,6 +74,23 @@ check_page dg3 dg3.php "${common[@]}" "${series[@]}" "${target[@]}"
 check_page dgov dgovser.php "${common[@]}" "${series[@]}" "${target[@]}"
 check_page formamide formamide.php "${common[@]}" "${target[@]}" --data-urlencode Po=250 \
     --data-urlencode "probe[]=$PROBE" --data-urlencode "organism[]=$ORG" --data-urlencode chkdata=0
+# Repeated and out-of-range rows must collapse to one pair (SYS-4247). Before the fix this ran
+# 6 full passes and then failed with "Error encountered"; now it is one normal result.
+check_page formamide-repeats formamide.php "${common[@]}" "${target[@]}" --data-urlencode Po=250 \
+    --data-urlencode "probe[]=$PROBE" --data-urlencode "organism[]=$ORG" \
+    --data-urlencode "chkdata=0 0 0 0 0 0 0 0 9 -1 x 00" \
+    --expect-alignments 1
+# What the browser sends when row 1 is unchecked: only the checked rows' probe[]/organism[]
+# (unchecked rows are disabled), and chkdata names the rows. Each checked row must give a pair.
+check_page formamide-rows-2-4 formamide.php "${common[@]}" "${target[@]}" --data-urlencode Po=250 \
+    --data-urlencode "probe[]=$PROBE" --data-urlencode "organism[]=$ORG" \
+    --data-urlencode "probe[]=$COMPE" --data-urlencode "organism[]=$ORG" \
+    --data-urlencode "chkdata= 1 3" \
+    --expect-alignments 2
+check_page formamide-row-3 formamide.php "${common[@]}" "${target[@]}" --data-urlencode Po=250 \
+    --data-urlencode "probe[]=$PROBE" --data-urlencode "organism[]=$ORG" \
+    --data-urlencode "chkdata= 2" \
+    --expect-alignments 1
 check_page mismatch Step3.php "${common[@]}" "${target[@]}" --data-urlencode Po=250 \
     --data-urlencode "ipprobesequence=$PROBE" --data-urlencode "organism=$ORG" --data-urlencode "mismatch=$MM"
 check_page competitor compe.php "${common[@]}" "${target[@]}" --data-urlencode Po=250 --data-urlencode Co=5000 \
@@ -71,4 +98,4 @@ check_page competitor compe.php "${common[@]}" "${target[@]}" --data-urlencode P
     --data-urlencode "organism=$ORG" --data-urlencode "nontarget=$ORG"
 
 echo "pages checked: $checked, passed: $passed"
-[ "$checked" -eq 8 ] && [ "$passed" -eq 8 ]
+[ "$checked" -eq 11 ] && [ "$passed" -eq 11 ]

@@ -130,18 +130,36 @@ foreach ($varNames as $varName) {
 	}
 }
 
-// Parse selected indices
+// Parse selected rows: only indices 0-4, each at most once.
+// WHY: formamide.html has 5 probe/target rows, and each index is one full ClustalW + UNAFold
+// pass in formamide.py. Without this, one anonymous POST of "0 0 0 ..." queued unlimited
+// passes and held a CPU and an Apache worker until they finished (SYS-4247).
 $chkdata = $_POST['chkdata'] ?? '';
-$checked_indices = explode(" ", trim(is_string($chkdata) ? $chkdata : ''));
-$organisms = is_array($_POST['organism'] ?? null) ? $_POST['organism'] : [];
-$probes = is_array($_POST['probe'] ?? null) ? $_POST['probe'] : [];
+$checked_indices = [];
+foreach (preg_split('/\s+/', trim(is_string($chkdata) ? $chkdata : '')) as $tok) {
+    if (preg_match('/^[0-4]$/', $tok) && !in_array((int) $tok, $checked_indices, true)) {
+        $checked_indices[] = (int) $tok;
+    }
+}
+$organisms = is_array($_POST['organism'] ?? null) ? array_values($_POST['organism']) : [];
+$probes = is_array($_POST['probe'] ?? null) ? array_values($_POST['probe']) : [];
+
+// Map checked rows to the posted sequences.
+// The browser disables unchecked rows, and disabled fields are not posted, so probe[] holds
+// ONLY the checked rows, in row order: the k-th checked row is $probes[k]. Looking them up
+// by row number instead dropped pairs whenever row 1 was unchecked or rows had gaps
+// (rows 2+4 gave 1 pair, row 3 alone gave an error page). A client that posts every row
+// still gets the row-number lookup.
+if (count($probes) === count($checked_indices)) {
+    $rows = array_keys($checked_indices);
+} else {
+    $rows = $checked_indices;
+}
 
 // Write probes
 fwrite($file, "VAR_probes\n");
 $selectedProbes = [];
-foreach ($checked_indices as $i) {
-    if ($i === '') continue;
-    $idx = (int) $i;
+foreach ($rows as $idx) {
     if (isset($probes[$idx])) {
         $selectedProbes[] = fstripCommandTricks($probes[$idx]);
     }
@@ -151,9 +169,7 @@ fwrite($file, implode(";", $selectedProbes) . "\n");
 // Write organisms
 fwrite($file, "VAR_organisms\n");
 $selectedOrganisms = [];
-foreach ($checked_indices as $i) {
-    if ($i === '') continue;
-    $idx = (int) $i;
+foreach ($rows as $idx) {
     if (isset($organisms[$idx])) {
         $selectedOrganisms[] = fstripCommandTricks($organisms[$idx]);
     }

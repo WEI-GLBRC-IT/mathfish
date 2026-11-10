@@ -171,7 +171,7 @@ docker exec -w /var/www/html mathfish bash /tmp/run_cli_tests.sh > tests.out
 python3 tests/compare_cli_output.py tests/expected_cli.out tests.out
 ```
 
-To post all 8 forms through Apache and PHP, then check the error log for PHP warnings:
+To post all 8 forms through Apache and PHP (plus three formamide row-selection checks, SYS-4247), then check the error log for PHP warnings:
 
 ```bash
 docker cp tests/run_http_tests.sh mathfish:/tmp/run_http_tests.sh

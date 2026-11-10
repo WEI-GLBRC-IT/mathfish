@@ -30,6 +30,10 @@ try:
     bad_alignments=[]
     Targets = [re.sub(' ','',x.upper()) for x in vars['organisms'].split(';')]
     Probes = [re.sub('U','T',re.sub(' ','',x)) for x in vars['probes'].split(';')];
+    # Refuse more than 5 pairs before any ClustalW/UNAFold run: the page allows 5, and the
+    # plot only has 5 colours. Backstop for formamide.php's own cap (SYS-4247).
+    if len(Probes) > 5 or len(Targets) > 5:
+        raise ValueError(f'too many probe/target pairs ({len(Probes)}); the maximum is 5')
     stack, deltaH, deltaS = read_stacking_file('inputFiles/stacking.txt')
     
     alignments,DG1,DG2,DG3,Length=[],[],[],[],[]

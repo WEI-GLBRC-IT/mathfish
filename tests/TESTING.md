@@ -16,11 +16,11 @@ python3 tests/compare_cli_output.py tests/expected_cli.out tests.out
 
 ## Posting the forms through Apache + PHP
 
-The CLI suite calls the Python scripts directly, so it never exercises PHP. `tests/run_http_tests.sh` posts each of the 8 forms with the same inputs. A page passes on HTTP 200, no error text, and every linked plot downloading as a PNG. PHP warnings go to the Apache error log rather than the page, so check that too:
+The CLI suite calls the Python scripts directly, so it never exercises PHP. `tests/run_http_tests.sh` posts each of the 8 forms with the same inputs, plus three formamide posts: repeated and out-of-range rows must return one result (SYS-4247), and rows 2+4 or row 3 alone, sent the way the browser sends them, must return one result per checked row. A page passes on HTTP 200, no error text, and every linked plot downloading as a PNG. PHP warnings go to the Apache error log rather than the page, so check that too:
 
 ```bash
 docker cp tests/run_http_tests.sh mathfish:/tmp/run_http_tests.sh
-docker exec mathfish bash /tmp/run_http_tests.sh          # expect "pages checked: 8, passed: 8"
+docker exec mathfish bash /tmp/run_http_tests.sh          # expect "pages checked: 11, passed: 11"
 docker logs mathfish 2>&1 | grep -cE 'PHP (Parse error|Fatal error|Warning|Deprecated|Notice)'   # expect 0
 ```
 
