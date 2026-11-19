@@ -409,16 +409,21 @@ def newaligner(Targetori, targetsite1, targetsite2, targetmolecule, domain,acces
         Targetdomain[i, :] = [Targetnet[start_index], Targetnet[end_index]]
 
     # Correction for end points
-    Targetdomain[0, 0] = 1
+    # Clamp every domain start to base 1: a domain that starts before the target's first base maps to 0.
+    # A partial target starting mid-domain (e.g. a 260-nt piece of 28S) otherwise gave first=0 and an
+    # empty fragment, and deltaG3 crashed on UNAFold's header-only .dG (codes bKLlO/1C24W, 2026-11-19).
+    Targetdomain[:, 0] = np.maximum(Targetdomain[:, 0], 1)
     Targetdomain[-1, 1] = len(Targetori)
-    
+
    # Determining the targeted domain
     indexa = max([i for i, x in enumerate(Targetdomain[:, 0]) if x <= targetsite1])
     indexb = min([i for i, x in enumerate(Targetdomain[:, 1]) if x >= targetsite2])
     first = Targetdomain[indexa][0]
     last = Targetdomain[indexb][1]
     fragment = Targetori[first-1:last]
-    
+    if not (1 <= first <= targetsite1 and targetsite2 <= last <= len(Targetori)):
+        raise ValueError(f'Target fragment {first}-{last} does not cover the probe site {targetsite1}-{targetsite2}')
+
     # Create sequence file for UNAFold program
     target_seq_filename = f'userFiles/target_{access_code}.seq'
     with open(target_seq_filename, 'w') as file:

@@ -4,7 +4,7 @@ This document describes how to validate a running mathFISH container. Each of th
 
 ## Running the full CLI suite
 
-`tests/run_cli_tests.sh` runs all 8 CLI cases below in sequence and prints one block per case. Useful for quick regression checks after changing the image or the Python code.
+`tests/run_cli_tests.sh` runs 9 CLI cases in sequence (the 8 features below, plus case 9: General Analysis on a partial eukaryote 28S target, the 2026-11-19 crash; see `internal/docs/`) and prints one block per case. Useful for quick regression checks after changing the image or the Python code.
 
 ```bash
 docker cp tests/run_cli_tests.sh mathfish:/tmp/run_cli_tests.sh

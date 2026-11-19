@@ -163,7 +163,7 @@ See [tests/TESTING.md](tests/TESTING.md) for:
 - Expected output values for validation
 - A copy-pasteable General Analysis smoke test
 
-To run all 8 CLI cases against the running container and compare them with the reference output:
+To run all 9 CLI cases against the running container and compare them with the reference output:
 
 ```bash
 docker cp tests/run_cli_tests.sh mathfish:/tmp/run_cli_tests.sh

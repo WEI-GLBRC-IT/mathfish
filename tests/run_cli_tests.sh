@@ -59,3 +59,11 @@ run_case mismatch mismatch.py \
 # 8. Competitor
 run_case competitor competitor.py \
 "VAR_T\n46\nVAR_NA\n1\nVAR_Po\n250\nVAR_Co\n5000\nVAR_probe\n${PROBE}\nVAR_compe\n${COMPE}\nVAR_targetmolecule\nssu\nVAR_domain\nb\nVAR_organism\n${ORG}\nVAR_nontarget\n${ORG}\n"
+
+# 9. General Analysis, partial eukaryote 28S target starting mid-domain (reference
+# bases 1677-1936, inside domain 3: 1451-1878). Before 2026-11-19 newaligner built
+# an empty fragment and deltaG3 crashed (user codes bKLlO, 1C24W).
+LSU_TGT=$(tr -d '\n' < inputFiles/ref-elsu.txt | cut -c1677-1936)
+LSU_PROBE=$(printf '%s' "${LSU_TGT:19:20}" | rev | tr ACGT TGCA)
+run_case general_lsu_partial general.py \
+"VAR_T\n46\nVAR_NA\n0.9\nVAR_Po\n250\nVAR_entry\np\nVAR_ts1\nNA\nVAR_ts2\nNA\nVAR_iptargetsequence\nNA\nVAR_ipprobesequence\n${LSU_PROBE}\nVAR_targetmolecule\nlsu\nVAR_domain\ne\nVAR_organism\n${LSU_TGT}\n"
