@@ -25,7 +25,7 @@ mathFISH ships as a single Docker image. The image is built locally from a UNAFo
 
 | Component  | Version | Source           | Purpose                                                  |
 |------------|---------|------------------|----------------------------------------------------------|
-| PHP        | 8.4 (≥ 8.4.27) | `php:8.4-apache-bookworm` | Web frontend                                |
+| PHP        | 8.4 (≥ 8.4.28) | `php:8.4-apache-bookworm` | Web frontend                                |
 | Apache     | 2.4     | `php:8.4-apache-bookworm` | Web server                                      |
 | Python     | 3.11    | Debian bookworm  | Computation scripts                                      |
 | numpy      | 1.24    | Debian bookworm  | Numerical computing                                      |
@@ -35,7 +35,7 @@ mathFISH ships as a single Docker image. The image is built locally from a UNAFo
 
 ### Version choices
 
-- **PHP 8.4, at least 8.4.27.** The image builds from `php:8.4-apache-bookworm`, which follows 8.4 patch releases. A build step fails on anything older than 8.4.27, the release that fixed PHP2Shell (CVE-2026-109618, CVE-2026-109619). PHP 8.4 gets security fixes until 31 Dec 2028.
+- **PHP 8.4, at least 8.4.28.** The image builds from `php:8.4-apache-bookworm`, which follows 8.4 patch releases. A build step fails on anything older than 8.4.28, the release that fixed phpAfterShell (CVE-2026-126714); 8.4.27 fixed PHP2Shell (CVE-2026-109618, CVE-2026-109619). PHP 8.4 gets security fixes until 31 Dec 2028.
 - **Debian bookworm, not trixie.** Bookworm's gcc 12 compiles UNAFold 3.3's old C; trixie's gcc 14 is stricter and untested here.
 - **numpy and matplotlib from Debian packages.** Bookworm's pip refuses system-wide installs.
 - **Results unchanged from the PHP 7.4 / numpy 1.19 image (checked 2026-10).** All 8 CLI cases match its output ([tests/expected_cli.out](tests/expected_cli.out)): text identical, 342 of 972 numbers moved in the last digits, at most 4.2e-14 relative. CI repeats this check on every build.

@@ -4,16 +4,17 @@
 
 # PHP 8.4 on Debian bookworm. The minor-version tag picks up 8.4 patch
 # releases on rebuild (CI builds with --pull); the floor check below fails
-# the build on anything older than the PHP2Shell fix.
+# the build on anything older than the phpAfterShell fix.
 # Bookworm, not trixie: its gcc 12 is more tolerant of UNAFold 3.3's old C.
 FROM php:8.4-apache-bookworm
 
 LABEL maintainer="WEI IS Team"
 LABEL description="mathFISH - FISH probe thermodynamic calculator"
 
-# PHP2Shell (CVE-2026-109618, CVE-2026-109619) is fixed in 8.4.27.
-RUN php -r 'exit(version_compare(PHP_VERSION, "8.4.27", "<") ? 1 : 0);' \
-    || { echo "PHP $(php -r 'echo PHP_VERSION;') predates the PHP2Shell fix (8.4.27)"; exit 1; }
+# Floor: 8.4.28 fixes phpAfterShell (CVE-2026-126714, session-file race).
+# 8.4.27 fixed PHP2Shell (CVE-2026-109618, CVE-2026-109619).
+RUN php -r 'exit(version_compare(PHP_VERSION, "8.4.28", "<") ? 1 : 0);' \
+    || { echo "PHP $(php -r 'echo PHP_VERSION;') predates the phpAfterShell fix (8.4.28)"; exit 1; }
 
 # Ensure /usr/local/bin is in PATH for all processes (where clustalw2 and UNAFold install)
 ENV PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
